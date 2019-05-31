@@ -111,10 +111,6 @@ const init = async () => {
       payloadEntry = `, payload`;
     }
 
-    // 'if (methodSignature.length === 0){
-    //   sigT
-    // }'
-
     const methodReturn = m[3];
     clientDTSString += '\n';
     clientDTSString += `
