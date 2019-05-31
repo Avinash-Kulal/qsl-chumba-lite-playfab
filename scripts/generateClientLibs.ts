@@ -10,7 +10,45 @@ const serverScriptLocation = `${currentDir}/src/serverCode.ts`;
 
 const outputDir = `${currentDir}/client/index.ts`;
 
-const callToPlayFabString = `import { PlayFabClient } from 'playfab-sdk';
+const callToPlayFabString = `import { PlayFab, PlayFabClient } from 'playfab-sdk';
+
+export { PlayFab } from 'playfab-sdk';
+
+export const SetPlayFabTitleId = (titleId: string) =>{
+  PlayFab.settings.titleId = titleId;
+};
+
+// Auth methods.
+// We add this in to get config on the restun too.
+export const LoginWithCustomIdAsync = async (customId: string): Promise<PlayFabClientModels.LoginResult> => {
+  return new Promise<PlayFabClientModels.LoginResult>((resolve, reject) => {
+    PlayFabClient.LoginWithCustomID(
+      {
+        CreateAccount: true,
+        CustomId: customId,
+        InfoRequestParameters: {
+          GetTitleData: true,
+          GetCharacterInventories: false,
+          GetCharacterList: false,
+          GetPlayerProfile: false,
+          GetPlayerStatistics: false,
+          GetUserAccountInfo: false,
+          GetUserData: false,
+          GetUserInventory: false,
+          GetUserReadOnlyData: false,
+          GetUserVirtualCurrency: false,
+        },
+      },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LoginResult>) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(res.data);
+      },
+    );
+  });
+};
+
 const callToPlayFab = async (
   FunctionName: string,
   FunctionParameter: any,
@@ -63,16 +101,25 @@ const init = async () => {
     }
 
     // The result can be accessed through the `m`-variable.
-    // console.log(m);
     const methodName = m[1];
     const methodSignature: string = m[2];
     const sigTypeMatch = methodSignature.match(/: (\w+)/);
+    let payloadSig = ``;
+    let payloadEntry = `, {}`;
+    if (sigTypeMatch !== null) {
+      payloadSig = `payload: ${sigTypeMatch[1]}`;
+      payloadEntry = `, payload`;
+    }
+
+    // 'if (methodSignature.length === 0){
+    //   sigT
+    // }'
 
     const methodReturn = m[3];
     clientDTSString += '\n';
     clientDTSString += `
-export const Call${methodName} = async (payload: ${sigTypeMatch[1]} ): Promise<${methodReturn}> => {
-  const response = await callToPlayFab('${methodName}', payload);
+export const Call${methodName} = async (${payloadSig}): Promise<${methodReturn}> => {
+  const response = await callToPlayFab('${methodName}'${payloadEntry});
   return response.FunctionResult;
 };`;
   }
