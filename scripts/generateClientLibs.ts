@@ -94,6 +94,7 @@ const init = async () => {
 
   let m;
 
+  // tslint:disable-next-line: no-conditional-assignment
   while ((m = regex.exec(serverScriptData)) !== null) {
     // This is necessary to avoid infinite loops with zero-width matches
     if (m.index === regex.lastIndex) {
