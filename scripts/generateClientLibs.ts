@@ -25,18 +25,6 @@ export const LoginWithCustomIdAsync = async (customId: string): Promise<PlayFabC
       {
         CreateAccount: true,
         CustomId: customId,
-        InfoRequestParameters: {
-          GetTitleData: true,
-          GetCharacterInventories: false,
-          GetCharacterList: false,
-          GetPlayerProfile: false,
-          GetPlayerStatistics: false,
-          GetUserAccountInfo: false,
-          GetUserData: false,
-          GetUserInventory: false,
-          GetUserReadOnlyData: false,
-          GetUserVirtualCurrency: false,
-        },
       },
       (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LoginResult>) => {
         if (error) {
