@@ -49,7 +49,7 @@ const AsyncUploadCC = (contents: string): Promise<any> => {
 const init = async () => {
   // read the server code for contents
   const serverCode = fs
-    .readFileSync(currentDir + '/dist/src/serverCode.js')
+    .readFileSync(currentDir + '/dist/serverCode.js')
     .toString('utf-8');
   // Upload and publish to PlayFab
   const result = await AsyncUploadCC(serverCode);

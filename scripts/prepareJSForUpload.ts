@@ -12,7 +12,7 @@ dotenv.config({
 
 // TODO - Fail if script dir does not exist
 
-const serverScriptLocation = `${currentDir}/dist/src/serverCode.js`;
+const serverScriptLocation = `${currentDir}/dist/serverCode.js`;
 
 // we're going to remove this shit...
 /*

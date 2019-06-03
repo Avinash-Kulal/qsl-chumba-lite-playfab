@@ -5,7 +5,6 @@ import * as fs from 'fs';
 // Setup environment to look at the calling dir.
 const currentDir = process.cwd();
 
-const typesLocation = `${currentDir}/types/types.ts`;
 const serverScriptLocation = `${currentDir}/src/serverCode.ts`;
 
 const outputDir = `${currentDir}/client/index.ts`;
@@ -81,24 +80,68 @@ const init = async () => {
   Please do not manually edit.
 */`;
 
-  // copy in types
-  const typesStringData = fs.readFileSync(typesLocation).toString('utf-8');
-  clientDTSString += `\n${typesStringData}`;
+  // ^interface (\w*) {(.*?)}\n
+  // ^enum (\w*) {(.*?)}\n
+  // ^type (\w*) = {(.*?)}\n
 
-  // Seed our method to call the lib.
-  clientDTSString += `\n${callToPlayFabString}`;
-
-  // now, grab public methods from the server script
+  // Find our interfaces, enums + types in our server code + make them available in client (and simulation)
+  // code
+  const interfaceRegex = /^interface (\w*) {(.*?)}\n/gms;
+  const enumRegex = /^enum (\w*) {(.*?)}\n/gms;
+  const typeRegex = /^type (\w*) = {(.*?)}\n/gms;
   const serverScriptData = fs.readFileSync(serverScriptLocation).toString('utf-8');
-  const regex = /\/\* Client \*\/.*?const (.*?) = \((.*?)\): (.*?) =/gs;
+
+  // add our types, interfaces and enums to the client dts string
 
   let m;
 
   // tslint:disable-next-line: no-conditional-assignment
-  while ((m = regex.exec(serverScriptData)) !== null) {
+  while ((m = interfaceRegex.exec(serverScriptData)) !== null) {
     // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === regex.lastIndex) {
-      regex.lastIndex++;
+    if (m.index === interfaceRegex.lastIndex) {
+      interfaceRegex.lastIndex++;
+    }
+    clientDTSString += `
+export interface ${m[1]} {
+${m[2]}
+}`;
+  }
+
+  // tslint:disable-next-line: no-conditional-assignment
+  while ((m = enumRegex.exec(serverScriptData)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === enumRegex.lastIndex) {
+      enumRegex.lastIndex++;
+    }
+    clientDTSString += `
+export enum ${m[1]} {
+${m[2]}
+}`;
+  }
+
+  // tslint:disable-next-line: no-conditional-assignment
+  while ((m = typeRegex.exec(serverScriptData)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === typeRegex.lastIndex) {
+      typeRegex.lastIndex++;
+    }
+    clientDTSString += `
+export type ${m[1]} = {
+${m[2]}
+}`;
+  }
+  // Seed our method to call the lib.
+  clientDTSString += `\n${callToPlayFabString}`;
+
+  // now, grab public methods from the server script
+
+  const exposedServerCallRegex = /\/\* Client \*\/.*?const (.*?) = \((.*?)\): (.*?) =/gs;
+
+  // tslint:disable-next-line: no-conditional-assignment
+  while ((m = exposedServerCallRegex.exec(serverScriptData)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === exposedServerCallRegex.lastIndex) {
+      exposedServerCallRegex.lastIndex++;
     }
 
     // The result can be accessed through the `m`-variable.
