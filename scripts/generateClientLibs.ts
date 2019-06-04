@@ -17,6 +17,14 @@ export const SetPlayFabTitleId = (titleId: string) =>{
   PlayFab.settings.titleId = titleId;
 };
 
+// Typings for playfab results to ensure visibility to errors, etc
+interface PlayFabFunctionResult {
+  FunctionName: string;
+  Logs: object[];
+  Error?: PlayFabCloudScriptModels.ScriptExecutionError;
+}
+
+
 // Auth methods.
 // We add this in to get config on the restun too.
 export const LoginWithCustomIdAsync = async (customId: string): Promise<PlayFabClientModels.LoginResult> => {
@@ -146,12 +154,27 @@ ${m[2]}
     const methodReturn = m[3];
     clientDTSString += '\n';
     clientDTSString += `
-export const Call${methodName} = async (${payloadSig}): Promise<${methodReturn}> => {
+
+interface PlayFab${methodReturn} extends PlayFabFunctionResult {
+  FunctionResult: ${methodReturn};
+}
+
+export const Call${methodName} = async (${payloadSig}): Promise<PlayFab${methodReturn}> => {
   const response = await callToPlayFab('${methodName}'${payloadEntry});
-  return response.FunctionResult;
+  const data: PlayFab${methodReturn} = {
+    FunctionName: response.FunctionName,
+    Logs: response.Logs,
+    FunctionResult: response.FunctionResult,
+  };
+  if (response.Error) {
+    data.Error = response.Error;
+  }
+  return data;
 };`;
   }
   clientDTSString += `\n`;
+
+
   fs.writeFileSync(outputDir, clientDTSString, { encoding: 'utf-8' });
 };
 

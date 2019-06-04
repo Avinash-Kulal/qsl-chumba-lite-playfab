@@ -105,6 +105,16 @@ const UploadStatisticDefinitionsAsync = (statItem: PlayFabAdminModels.CreatePlay
   });
 };
 
+// const recursivelyRemoveTypeString = (obj: any): any => {
+//   delete obj['_type'];
+//   Object.keys(obj).forEach(key => {
+//     if (typeof obj[key] === 'object') {
+//       recursivelyRemoveTypeString(obj[key]);
+//     }
+//   });
+//   return obj;
+// };
+
 const init = async () => {
   // Get the current config...
   // Upload and publish to PlayFab
@@ -134,8 +144,9 @@ const init = async () => {
   const titleKeys = Object.keys(titleDataContents);
   for (let k = 0; k < titleKeys.length; k++) {
     // Only get stuff back on errors.
-
-    await SetTitleDataAsync(titleKeys[k], JSON.stringify(titleDataContents[titleKeys[k]]));
+    // go deep and remove the _type keys..
+    // const titleDataObject = recursivelyRemoveTypeString(titleDataContents[titleKeys[k]]);
+    await SetTitleDataAsync(titleKeys[k], JSON.stringify(titleDataContents[titleKeys[k]]['data']));
   }
 
   const statsPath = `${currentDir}/config/Statistics.json`;
