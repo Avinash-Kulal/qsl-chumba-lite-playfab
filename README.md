@@ -19,9 +19,26 @@ If you need any assistance in getting up and running, please see Dave.
 
 ## Important Files
 
+`scripts/generateServerTypes.ts`
+
+Parses the PlayFab configuration in the host `config` folder and generates types for them. In particular, currency enums and any identified typings for the Title Data.
+The `TitleData.json` needs a specific format for this. It is outlined below.
+
+```
+{
+  "titleDataKey": {
+    "type" : "well defined type or custom type in serverCode.ts",
+    "data": <data to be uploaded to PlayFab>
+  },
+  "another titlekey": {
+    "data": < if type is left off, the title key will be typed as 'any'>
+  }
+}
+```
+
 `scripts/synchronizeWithPlayFab.ts`
 
-Finds JSON files in the host project's `config` folder to upload to PlayFab.
+Finds JSON files in the host project's `config` folder to upload to PlayFab, parsing as needed.
 
 `scripts/prepareJSForUpload.ts`
 
