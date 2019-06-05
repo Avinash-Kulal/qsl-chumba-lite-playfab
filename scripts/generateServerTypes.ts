@@ -7,13 +7,14 @@ import * as fs from 'fs';
 const currentDir = process.cwd();
 const chalk = chalkModule.default;
 
-const serverScriptLocation = `${currentDir}/src/serverCode.ts`;
+// const serverScriptLocation = `${currentDir}/src/serverCode.ts`;
+const typesLocation = `${currentDir}/src/types.ts`
 const currencyPath = `${currentDir}/config/Currency.json`;
 const titleDataPath = `${currentDir}/config/TitleData.json`;
 const statsPath = `${currentDir}/config/Statistics.json`;
 
-if (!fs.existsSync(serverScriptLocation)) {
-  console.log(chalk.red.bold('Server file does not exist. Skipping'));
+if (!fs.existsSync(typesLocation)) {
+  console.log(chalk.red.bold('Types file does not exist. Skipping'));
   process.exit(0);
 }
 
@@ -30,7 +31,7 @@ toreplace
 
 const init = async () => {
   // read the server code for contents
-  let serverCode = fs.readFileSync(serverScriptLocation).toString('utf-8');
+  let typesCode = fs.readFileSync(typesLocation).toString('utf-8');
   let generatedCode = '';
   // read our currencies + auto gen them
   if (fs.existsSync(currencyPath)) {
@@ -38,7 +39,7 @@ const init = async () => {
     const currenciesData = JSON.parse(fs.readFileSync(currencyPath).toString('utf-8'));
     console.log(chalk.green(`Found currency data`));
     generatedCode += `
-enum PlayFabCurrencyCodes {
+export enum PlayFabCurrencyCodes {
 `;
     currenciesData.forEach(element => {
       console.log(chalk.green(`Adding ${element.CurrencyCode}`));
@@ -47,7 +48,7 @@ enum PlayFabCurrencyCodes {
     generatedCode += `
 }`;
     generatedCode += `
-enum PlayFabCurrencyDisplayNames {
+export enum PlayFabCurrencyDisplayNames {
 `;
     currenciesData.forEach(element => {
       generatedCode += `${element.CurrencyCode} = '${element.DisplayName}',\n`;
@@ -61,7 +62,7 @@ enum PlayFabCurrencyDisplayNames {
     const titleData: { [key: string]: any } = JSON.parse(fs.readFileSync(titleDataPath).toString('utf-8'));
     // ok. lets gen our stuff.
     console.log(chalk.green('Found title data'));
-    let generatedTitleType = `\ninterface PlayFabTitleData {\n`;
+    let generatedTitleType = `\nexport interface PlayFabTitleData {\n`;
     Object.keys(titleData).forEach(key => {
       let keyType: string = titleData[key]['type'];
       if (typeof keyType === 'undefined') {
@@ -100,7 +101,7 @@ enum PlayFabCurrencyDisplayNames {
     // ok. lets gen our stuff.
     console.log(chalk.green('Found statistics data'));
     generatedCode += `
-enum PlayFabStatistics {
+export enum PlayFabStatistics {
 `;
     statsData.forEach(element => {
       console.log(chalk.green(`Adding ${element.StatisticName}`));
@@ -111,8 +112,8 @@ enum PlayFabStatistics {
   }
 
   // Upload and publish to PlayFab
-  serverCode = serverCode.replace(regex, template.replace('toreplace', generatedCode));
-  fs.writeFileSync(serverScriptLocation, serverCode, { encoding: 'utf-8' });
+  typesCode = typesCode.replace(regex, template.replace('toreplace', generatedCode));
+  fs.writeFileSync(typesLocation, typesCode, { encoding: 'utf-8' });
 };
 
 // const getObjectNameAndCode = (prefix: string, objKey: string, obj: any): { objTypeName: string; objCode: string } => {

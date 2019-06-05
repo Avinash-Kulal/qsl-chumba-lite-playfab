@@ -5,7 +5,7 @@ import * as fs from 'fs';
 // Setup environment to look at the calling dir.
 const currentDir = process.cwd();
 
-const serverScriptLocation = `${currentDir}/src/serverCode.ts`;
+const serverScriptLocation = `${currentDir}/combined/serverCode.ts`;
 
 const outputDir = `${currentDir}/client/index.ts`;
 
