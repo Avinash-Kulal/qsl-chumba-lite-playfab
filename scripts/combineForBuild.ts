@@ -32,6 +32,9 @@ const init = async () => {
   // copy our utils stuff into the server code
   let utilsContent = fs.readFileSync(utilsLocation).toString('utf-8');
 
+  // trim imports.
+  utilsContent = utilsContent.replace(/^import .*/gm, '');
+
   // remote export prefix from stuff in here.
   utilsContent = utilsContent.replace(/^export /gm, '');
 
@@ -40,6 +43,9 @@ const init = async () => {
 
   // do the same with our types files
   let typesContent = fs.readFileSync(typesLocation).toString('utf-8');
+
+  // trim imports.
+  typesContent = typesContent.replace(/^import .*/gm, '');
 
   // remote export prefix from stuff in here.
   typesContent = typesContent.replace(/^export /gm, '');
