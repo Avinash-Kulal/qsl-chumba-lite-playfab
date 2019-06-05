@@ -21,6 +21,7 @@ export const SetPlayFabTitleId = (titleId: string) =>{
 interface PlayFabFunctionResult {
   FunctionName: string;
   Logs: object[];
+  APIRequestsIssued: number;
   Error?: PlayFabCloudScriptModels.ScriptExecutionError;
 }
 
@@ -165,6 +166,7 @@ export const Call${methodName} = async (${payloadSig}): Promise<PlayFab${methodR
     FunctionName: response.FunctionName,
     Logs: response.Logs,
     FunctionResult: response.FunctionResult,
+    APIRequestsIssued: response.APIRequestsIssued,
   };
   if (response.Error) {
     data.Error = response.Error;
