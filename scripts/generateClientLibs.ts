@@ -176,7 +176,6 @@ export const Call${methodName} = async (${payloadSig}): Promise<PlayFab${methodR
   }
   clientDTSString += `\n`;
 
-
   fs.writeFileSync(outputDir, clientDTSString, { encoding: 'utf-8' });
 };
 

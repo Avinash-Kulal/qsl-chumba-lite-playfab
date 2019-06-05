@@ -8,7 +8,7 @@ const currentDir = process.cwd();
 const chalk = chalkModule.default;
 
 // const serverScriptLocation = `${currentDir}/src/serverCode.ts`;
-const typesLocation = `${currentDir}/src/types.ts`
+const typesLocation = `${currentDir}/src/types.ts`;
 const currencyPath = `${currentDir}/config/Currency.json`;
 const titleDataPath = `${currentDir}/config/TitleData.json`;
 const statsPath = `${currentDir}/config/Statistics.json`;

@@ -38,7 +38,7 @@ const init = async () => {
   // copy to bottom of server code
   serverCodeOutput += `\n${utilsContent}`;
 
-  // do the same with our types files 
+  // do the same with our types files
   let typesContent = fs.readFileSync(typesLocation).toString('utf-8');
 
   // remote export prefix from stuff in here.
