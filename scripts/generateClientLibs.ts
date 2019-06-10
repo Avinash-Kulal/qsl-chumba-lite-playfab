@@ -64,7 +64,66 @@ const callToPlayFab = async (
       },
     );
   });
-};`;
+};
+
+// Allow ability to also get read only data on command
+export const PFGetCombinedData = async (
+  dataKeys: UserDataKeys[],
+  readOnlyKeys: UserDataKeys[],
+): Promise<PlayFabClientModels.GetPlayerCombinedInfoResult> => {
+  return new Promise<PlayFabClientModels.GetPlayerCombinedInfoResult>((resolve, reject) => {
+    const InfoRequestParameters: PlayFabClientModels.GetPlayerCombinedInfoRequestParams = {
+      GetUserReadOnlyData: true,
+      GetUserData: true,
+      GetUserVirtualCurrency: true,
+      GetCharacterInventories: false,
+      GetCharacterList: false,
+      GetPlayerStatistics: true,
+      GetPlayerProfile: false,
+      GetTitleData: false,
+      GetUserAccountInfo: false,
+      GetUserInventory: true,
+    };
+    if (dataKeys.length > 0) {
+      InfoRequestParameters.UserDataKeys = dataKeys;
+    }
+    if (readOnlyKeys.length > 0) {
+      InfoRequestParameters.UserReadOnlyDataKeys = readOnlyKeys;
+    }
+    PlayFabClient.GetPlayerCombinedInfo(
+      {
+        InfoRequestParameters,
+      },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.GetPlayerCombinedInfoResult>) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(res.data);
+      },
+    );
+  });
+};
+
+export const PFSetUserData = async (Data: {
+  [key: string]: string;
+}): Promise<PlayFabClientModels.UpdateUserDataResult> => {
+  return new Promise<PlayFabClientModels.UpdateUserDataResult>((resolve, reject) => {
+    // we need for the types here to be strings. important - may want a check in here.
+    PlayFabClient.UpdateUserData(
+      {
+        Data,
+      },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.UpdateUserDataResult>) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(res.data);
+      },
+    );
+  });
+};
+
+`;
 
 // Ok, generate it!
 
