@@ -28,7 +28,7 @@ interface PlayFabFunctionResult {
 
 // Auth methods.
 // We add this in to get config on the restun too.
-export const LoginWithCustomIdAsync = async (customId: string): Promise<PlayFabClientModels.LoginResult> => {
+export const LoginWithCustomIdAsync = (customId: string): Promise<PlayFabClientModels.LoginResult> => {
   return new Promise<PlayFabClientModels.LoginResult>((resolve, reject) => {
     PlayFabClient.LoginWithCustomID(
       {
@@ -45,7 +45,7 @@ export const LoginWithCustomIdAsync = async (customId: string): Promise<PlayFabC
   });
 };
 
-const callToPlayFab = async (
+const callToPlayFab = (
   FunctionName: string,
   FunctionParameter: any,
 ): Promise<PlayFabCloudScriptModels.ExecuteCloudScriptResult> => {
@@ -67,7 +67,7 @@ const callToPlayFab = async (
 };
 
 // Allow ability to also get read only data on command
-export const PFGetCombinedData = async (
+export const PFGetCombinedData = (
   dataKeys: UserDataKeys[],
   readOnlyKeys: UserDataKeys[],
 ): Promise<PlayFabClientModels.GetPlayerCombinedInfoResult> => {
@@ -104,7 +104,7 @@ export const PFGetCombinedData = async (
   });
 };
 
-export const PFSetUserData = async (Data: {
+export const PFSetUserData = (Data: {
   [key: string]: string;
 }): Promise<PlayFabClientModels.UpdateUserDataResult> => {
   return new Promise<PlayFabClientModels.UpdateUserDataResult>((resolve, reject) => {
