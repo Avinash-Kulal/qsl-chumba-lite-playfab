@@ -1,6 +1,6 @@
 {
   "name": "playfab-server-tooling",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "PlayFab Server tool",
   "main": "index.js",
   "scripts": {

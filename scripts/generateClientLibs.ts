@@ -25,7 +25,6 @@ interface PlayFabFunctionResult {
   Error?: PlayFabCloudScriptModels.ScriptExecutionError;
 }
 
-
 // Auth methods.
 // We add this in to get config on the restun too.
 export const LoginWithCustomIdAsync = (customId: string): Promise<PlayFabClientModels.LoginResult> => {
