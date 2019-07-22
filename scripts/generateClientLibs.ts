@@ -45,6 +45,43 @@ export const LoginWithCustomIdAsync = (customId: string): Promise<PlayFabClientM
   });
 };
 
+export const GetLeaderboardAroundPlayer = (statName: PlayFabStatistics): Promise <PlayFabClientModels.GetLeaderboardAroundPlayerResult> => {
+  return new Promise<PlayFabClientModels.GetLeaderboardAroundPlayerResult>((resolve, reject) => {
+    PlayFabClient.GetLeaderboardAroundPlayer(
+      {
+        StatisticName: statName,
+      },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.GetLeaderboardAroundPlayerResult>) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(res.data);
+      },
+    );
+  });
+};
+
+export const GetLeaderboard = (
+  statName: PlayFabStatistics,
+  startPosition: number = 0,
+  numResults: number = 10): Promise <PlayFabClientModels.GetLeaderboardResult> => {
+  return new Promise<PlayFabClientModels.GetLeaderboardResult>((resolve, reject) => {
+    PlayFabClient.GetLeaderboard(
+      {
+        MaxResultsCount: numResults,
+        StartPosition: startPosition,
+        StatisticName: statName,
+      },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.GetLeaderboardResult>) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(res.data);
+      },
+    );
+  });
+};
+
 const callToPlayFab = (
   FunctionName: string,
   FunctionParameter: any,
