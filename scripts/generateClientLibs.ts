@@ -13,7 +13,7 @@ const callToPlayFabString = `import { PlayFab, PlayFabClient } from 'playfab-sdk
 
 export { PlayFab } from 'playfab-sdk';
 
-export const SetPlayFabTitleId = (titleId: string) =>{
+export const SetPlayFabTitleId = (titleId: string) => {
   PlayFab.settings.titleId = titleId;
 };
 
@@ -35,6 +35,40 @@ export const LoginWithCustomIdAsync = (customId: string): Promise<PlayFabClientM
         CustomId: customId,
       },
       (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LoginResult>) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(res.data);
+      },
+    );
+  });
+};
+
+export const LoginWithFacebookAsync = (accessToken: string): Promise<PlayFabClientModels.LoginResult> => {
+  return new Promise<PlayFabClientModels.LoginResult>((resolve, reject) => {
+    PlayFabClient.LoginWithFacebook(
+      {
+        CreateAccount: true,
+        AccessToken: accessToken,
+      },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LoginResult>) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(res.data);
+      },
+    );
+  });
+};
+
+export const LinkWithFacebookAsync = (accessToken: string): Promise<PlayFabClientModels.LinkFacebookAccountResult> => {
+  return new Promise<PlayFabClientModels.LinkFacebookAccountResult>((resolve, reject) => {
+    PlayFabClient.LinkFacebookAccount(
+      {
+        ForceLink: true,
+        AccessToken: accessToken,
+      },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LinkFacebookAccountResult>) => {
         if (error) {
           reject(error);
         }
@@ -157,9 +191,7 @@ export const PFSetUserData = (Data: {
       },
     );
   });
-};
-
-`;
+};`;
 
 // Ok, generate it!
 
@@ -206,9 +238,7 @@ ${m[2]}
       enumRegex.lastIndex++;
     }
     clientDTSString += `
-export enum ${m[1]} {
-${m[2]}
-}`;
+export enum ${m[1]} {${m[2]}}`;
   }
 
   // tslint:disable-next-line: no-conditional-assignment
@@ -250,7 +280,6 @@ ${m[2]}
     const methodReturn = m[3];
     clientDTSString += '\n';
     clientDTSString += `
-
 interface PlayFab${methodReturn} extends PlayFabFunctionResult {
   FunctionResult: ${methodReturn};
 }

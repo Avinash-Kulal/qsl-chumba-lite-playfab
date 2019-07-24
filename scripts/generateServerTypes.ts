@@ -23,11 +23,9 @@ if (!fs.existsSync(typesLocation)) {
 const regex = /(\/\/\/ BELOW CODE AUTO GENERATED, DO NOT TOUCH \/\/\/.*? ABOVE CODE AUTO GENERATED, DO NOT TOUCH \/\/\/)/gms;
 
 // replace this...
-const template = `
-/// BELOW CODE AUTO GENERATED, DO NOT TOUCH ///
+const template = `/// BELOW CODE AUTO GENERATED, DO NOT TOUCH ///
 toreplace
-/// ABOVE CODE AUTO GENERATED, DO NOT TOUCH ///
-`;
+/// ABOVE CODE AUTO GENERATED, DO NOT TOUCH ///`;
 
 const init = async () => {
   // read the server code for contents
@@ -43,7 +41,7 @@ export enum PlayFabCurrencyCodes {
 `;
     currenciesData.forEach(element => {
       console.log(chalk.green(`Adding ${element.CurrencyCode}`));
-      generatedCode += `${element.CurrencyCode} = '${element.CurrencyCode}',\n`;
+      generatedCode += `  ${element.CurrencyCode} = '${element.CurrencyCode}',\n`;
     });
     generatedCode += `
 }`;
@@ -51,7 +49,7 @@ export enum PlayFabCurrencyCodes {
 export enum PlayFabCurrencyDisplayNames {
 `;
     currenciesData.forEach(element => {
-      generatedCode += `${element.CurrencyCode} = '${element.DisplayName}',\n`;
+      generatedCode += `  ${element.CurrencyCode} = '${element.DisplayName}',\n`;
     });
     generatedCode += `
 }`;
@@ -64,33 +62,11 @@ export enum PlayFabCurrencyDisplayNames {
     console.log(chalk.green('Found title data'));
     let generatedTitleType = `\nexport interface PlayFabTitleData {\n`;
     Object.keys(titleData).forEach(key => {
-      let keyType: string = titleData[key]['type'];
+      let keyType: string = titleData[key].type;
       if (typeof keyType === 'undefined') {
         keyType = 'any';
       }
-      generatedTitleType += `${key}?: ${keyType};\n`;
-      // const objType = typeof titleData[key];
-      // if (objType === 'string') {
-      //   generatedTitleType += `${key}?: string;\n`;
-      // } else if (objType === 'number') {
-      //   generatedTitleType += `${key}?: number;\n`;
-      // } else if (objType === 'boolean') {
-      //   generatedTitleType += `${key}?: boolean;\n`;
-      // } else {
-      //   // We COULD dive further, but i feel like we can
-      //   // cast to a custom type if needed here.
-      //   if (Array.isArray(titleData[key])) {
-      //     // tis an array
-      //     generatedTitleType += `${key}?: any[];\n`;
-      //   } else {
-      //     // gen our custom internal type ehre
-      //     // const { objCode, objTypeName } = getObjectNameAndCode('TitleData', key, titleData[key]);
-
-      //     // generatedCode += objCode;
-      //     // generatedTitleType += `${key}?: ${objTypeName};\n`;
-      //     generatedTitleType += `${key}?: any;\n`;
-      //   }
-      // }
+      generatedTitleType += `  ${key}?: ${keyType};\n`;
     });
     generatedTitleType += `}`;
     generatedCode += generatedTitleType;
@@ -105,50 +81,14 @@ export enum PlayFabStatistics {
 `;
     statsData.forEach(element => {
       console.log(chalk.green(`Adding ${element.StatisticName}`));
-      generatedCode += `${element.StatisticName} = '${element.StatisticName}',\n`;
+      generatedCode += `  ${element.StatisticName} = '${element.StatisticName}',\n`;
     });
-    generatedCode += `
-}`;
+    generatedCode += `}`;
   }
 
   // Upload and publish to PlayFab
   typesCode = typesCode.replace(regex, template.replace('toreplace', generatedCode));
   fs.writeFileSync(typesLocation, typesCode, { encoding: 'utf-8' });
 };
-
-// const getObjectNameAndCode = (prefix: string, objKey: string, obj: any): { objTypeName: string; objCode: string } => {
-//   const objTypeName = `${prefix}${objKey}`;
-//   let extraTypes = '';
-//   let objCode = `\ninterface ${objTypeName} {\n`;
-//   Object.keys(obj).forEach(key => {
-//     const objType = typeof obj[key];
-//     if (objType === 'string') {
-//       objCode += `${key}?: string;\n`;
-//     } else if (objType === 'number') {
-//       objCode += `${key}?: number;\n`;
-//     } else if (objType === 'boolean') {
-//       objCode += `${key}?: boolean;\n`;
-//     } else {
-//       // We COULD dive further, but i feel like we can
-//       // cast to a custom type if needed here.
-//       if (Array.isArray(obj[key])) {
-//         // tis an array
-//         objCode += `${key}?: any[];\n`;
-//       } else {
-//         // gen our custom internal type ehre
-//         const data = getObjectNameAndCode(objTypeName, key, obj[key]);
-//         console.log(data);
-//         extraTypes += data.objCode;
-//         objCode += `${key}?: ${data.objTypeName};\n`;
-//       }
-//     }
-//   });
-//   objCode += `}\n`;
-//   objCode = extraTypes + objCode;
-//   return {
-//     objTypeName,
-//     objCode,
-//   };
-// };
 
 init();
