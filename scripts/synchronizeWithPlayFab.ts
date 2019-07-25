@@ -52,9 +52,22 @@ const AddVirtualCurrencyTypesAsync = (currencyContents: string): Promise<PlayFab
   });
 };
 
-const SetTitleDataAsync = (Key: string, Value: string): Promise<PlayFabAdminModels.SetTitleDataResult> => {
+const SetPublicTitleDataAsync = (Key: string, Value: string): Promise<PlayFabAdminModels.SetTitleDataResult> => {
   return new Promise<PlayFabAdminModels.SetTitleDataResult>((resolve, reject) => {
     PlayFabAdmin.SetTitleData({ Key, Value }, (error, res) => {
+      if (error) {
+        console.log(error);
+        reject(error);
+      }
+      resolve(res.data);
+    });
+  });
+};
+
+
+const SetInternalTitleDataAsync = (Key: string, Value: string): Promise<PlayFabAdminModels.SetTitleDataResult> => {
+  return new Promise<PlayFabAdminModels.SetTitleDataResult>((resolve, reject) => {
+    PlayFabAdmin.SetTitleInternalData({ Key, Value }, (error, res) => {
       if (error) {
         console.log(error);
         reject(error);
@@ -137,17 +150,31 @@ const init = async () => {
   // Please note, currency sync is additive ONLY, it will not remove old currencies
   await AddVirtualCurrencyTypesAsync(currencyContents);
   console.log(chalk.green(`Currencies have been updated! Please note it's additive`));
-  const titleDataPath = `${currentDir}/config/TitleData.json`;
-  const titleDataContents = JSON.parse(fs.readFileSync(titleDataPath, { encoding: `utf-8` }));
+  const publicTitleDataPath = `${currentDir}/config/PublicTitleData.json`;
+  const publicTitleDataContents = JSON.parse(fs.readFileSync(publicTitleDataPath, { encoding: `utf-8` }));
   // Please note, currency sync is additive ONLY, it will not remove old currencies
 
-  const titleKeys = Object.keys(titleDataContents);
-  for (let k = 0; k < titleKeys.length; k++) {
+  const publicTitleKeys = Object.keys(publicTitleDataContents);
+  for (let k = 0; k < publicTitleKeys.length; k++) {
     // Only get stuff back on errors.
     // go deep and remove the _type keys..
     // const titleDataObject = recursivelyRemoveTypeString(titleDataContents[titleKeys[k]]);
-    await SetTitleDataAsync(titleKeys[k], JSON.stringify(titleDataContents[titleKeys[k]]['data']));
+    await SetPublicTitleDataAsync(publicTitleKeys[k], JSON.stringify(publicTitleDataContents[publicTitleKeys[k]]['data']));
   }
+  console.log(chalk.green('Public title data set'));
+
+  const internalTitleDataPath = `${currentDir}/config/InternalTitleData.json`;
+  const internalTitleDataContents = JSON.parse(fs.readFileSync(internalTitleDataPath, { encoding: `utf-8` }));
+  // Please note, currency sync is additive ONLY, it will not remove old currencies
+
+  const internalTitleKeys = Object.keys(internalTitleDataContents);
+  for (let k = 0; k < internalTitleKeys.length; k++) {
+    // Only get stuff back on errors.
+    // go deep and remove the _type keys..
+    // const titleDataObject = recursivelyRemoveTypeString(titleDataContents[titleKeys[k]]);
+    await SetInternalTitleDataAsync(internalTitleKeys[k], JSON.stringify(internalTitleDataContents[internalTitleKeys[k]]['data']));
+  }
+  console.log(chalk.green('Internal title data set'));
 
   const statsPath = `${currentDir}/config/Statistics.json`;
   const statsPathContents = JSON.parse(fs.readFileSync(statsPath, { encoding: `utf-8` }));

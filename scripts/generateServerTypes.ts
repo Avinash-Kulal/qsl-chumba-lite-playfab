@@ -10,7 +10,8 @@ const chalk = chalkModule.default;
 // const serverScriptLocation = `${currentDir}/src/serverCode.ts`;
 const typesLocation = `${currentDir}/src/types.ts`;
 const currencyPath = `${currentDir}/config/Currency.json`;
-const titleDataPath = `${currentDir}/config/TitleData.json`;
+const publicTitleDataPath = `${currentDir}/config/PublicTitleData.json`;
+const internalTitleDataPath = `${currentDir}/config/InternalTitleData.json`;
 const statsPath = `${currentDir}/config/Statistics.json`;
 
 if (!fs.existsSync(typesLocation)) {
@@ -55,12 +56,30 @@ export enum PlayFabCurrencyDisplayNames {
 }`;
   }
 
-  // Title Data
-  if (fs.existsSync(titleDataPath)) {
-    const titleData: { [key: string]: any } = JSON.parse(fs.readFileSync(titleDataPath).toString('utf-8'));
+  // Public Title Data
+
+  if (fs.existsSync(publicTitleDataPath)) {
+    const titleData: { [key: string]: any } = JSON.parse(fs.readFileSync(publicTitleDataPath).toString('utf-8'));
     // ok. lets gen our stuff.
     console.log(chalk.green('Found title data'));
-    let generatedTitleType = `\nexport interface PlayFabTitleData {\n`;
+    let generatedTitleType = `\nexport interface PlayFabPublicTitleData {\n`;
+    Object.keys(titleData).forEach(key => {
+      let keyType: string = titleData[key].type;
+      if (typeof keyType === 'undefined') {
+        keyType = 'any';
+      }
+      generatedTitleType += `  ${key}?: ${keyType};\n`;
+    });
+    generatedTitleType += `}`;
+    generatedCode += generatedTitleType;
+  }
+
+
+  if (fs.existsSync(internalTitleDataPath)) {
+    const titleData: { [key: string]: any } = JSON.parse(fs.readFileSync(internalTitleDataPath).toString('utf-8'));
+    // ok. lets gen our stuff.
+    console.log(chalk.green('Found title data'));
+    let generatedTitleType = `\nexport interface PlayFabInternalTitleData {\n`;
     Object.keys(titleData).forEach(key => {
       let keyType: string = titleData[key].type;
       if (typeof keyType === 'undefined') {
