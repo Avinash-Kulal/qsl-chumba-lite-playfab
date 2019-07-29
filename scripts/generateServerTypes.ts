@@ -1,7 +1,7 @@
-// Run through our types and inject them into the server code.
-
 import * as chalkModule from 'chalk';
 import * as fs from 'fs';
+// Run through our types and inject them into the server code.
+
 
 // Setup environment to look at the calling dir.
 const currentDir = process.cwd();
