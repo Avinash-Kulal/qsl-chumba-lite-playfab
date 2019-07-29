@@ -1,11 +1,11 @@
+import * as chalkModule from 'chalk';
+import * as fs from 'fs';
 /*
 
 Given our server code + types, combine them into a file to be processed by PlayFab
 
 */
 
-import * as chalkModule from 'chalk';
-import * as fs from 'fs';
 
 // Setup environment to look at the calling dir.
 const currentDir = process.cwd();
@@ -17,8 +17,22 @@ const apiLocation = `${currentDir}/src/api.ts`;
 
 const combinedFileLocation = `${currentDir}/combined/serverCode.ts`;
 
-if (!fs.existsSync(typesLocation) || !fs.existsSync(utilsLocation) || !fs.existsSync(apiLocation)) {
-  console.log(chalk.red.bold('Missing files for combine. Please check and ensure you have all files setup'));
+if (
+  !fs.existsSync(typesLocation) ||
+  !fs.existsSync(utilsLocation) ||
+  !fs.existsSync(apiLocation)
+) {
+  console.log(
+    chalk.red.bold(
+      'Missing files for combine. Please check and ensure you have all files setup'
+    )
+  );
+  process.exit(0);
+}
+
+// check and see if combined dir exists.
+if (!fs.existsSync(`${currentDir}/combined/`)) {
+  console.log(chalk.red.bold('Please create a `combined` folder'));
   process.exit(0);
 }
 
@@ -53,7 +67,9 @@ const init = async () => {
   // copy to bottom of server code
   serverCodeOutput += `\n${typesContent}`;
 
-  fs.writeFileSync(combinedFileLocation, serverCodeOutput, { encoding: 'utf-8' });
+  fs.writeFileSync(combinedFileLocation, serverCodeOutput, {
+    encoding: 'utf-8'
+  });
   console.log(chalk.green.bold(`Files combined, ready for build + uploading`));
 };
 
