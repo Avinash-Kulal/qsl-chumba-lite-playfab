@@ -32,11 +32,11 @@ const init = () => __awaiter(this, void 0, void 0, function* () {
     let utilsContent = fs.readFileSync(utilsLocation).toString('utf-8');
     utilsContent = utilsContent.replace(/^import .*/gm, '');
     utilsContent = utilsContent.replace(/^export /gm, '');
-    serverCodeOutput += `\n${utilsContent}`;
+    serverCodeOutput = `${utilsContent}\n${serverCodeOutput}`;
     let typesContent = fs.readFileSync(typesLocation).toString('utf-8');
     typesContent = typesContent.replace(/^import .*/gm, '');
     typesContent = typesContent.replace(/^export /gm, '');
-    serverCodeOutput += `\n${typesContent}`;
+    serverCodeOutput = `${typesContent}\n${serverCodeOutput}`;
     fs.writeFileSync(combinedFileLocation, serverCodeOutput, {
         encoding: 'utf-8'
     });

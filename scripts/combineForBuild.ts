@@ -52,8 +52,8 @@ const init = async () => {
   // remote export prefix from stuff in here.
   utilsContent = utilsContent.replace(/^export /gm, '');
 
-  // copy to bottom of server code
-  serverCodeOutput += `\n${utilsContent}`;
+  // Put at top
+  serverCodeOutput = `${utilsContent}\n${serverCodeOutput}`;
 
   // do the same with our types files
   let typesContent = fs.readFileSync(typesLocation).toString('utf-8');
@@ -64,8 +64,8 @@ const init = async () => {
   // remote export prefix from stuff in here.
   typesContent = typesContent.replace(/^export /gm, '');
 
-  // copy to bottom of server code
-  serverCodeOutput += `\n${typesContent}`;
+  // put at top
+  serverCodeOutput = `${typesContent}\n${serverCodeOutput}`;
 
   fs.writeFileSync(combinedFileLocation, serverCodeOutput, {
     encoding: 'utf-8'

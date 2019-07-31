@@ -51,3 +51,6 @@ Uploads the compiled cloud code and publishes. Use with caution - will IMMEDIATE
 `scripts/generateClientLibs.ts`
 
 Parses the combined source cloud code in host project and generates typings for client projects that would connect to it. Looks for any enums, interfaces, types and any method tagged with `/* Client */`. Format of the code is _VERY_ important as we use regex to get all this info, use prettier or tslint. The `tslint.json` in this directory should suffice.
+
+
+If changes are made, be sure to run `npm run build` and bump the semver on `package.json`. This will enable the JS scripts to be called from importing projects to run npm scripts.
