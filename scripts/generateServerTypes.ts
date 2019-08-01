@@ -103,6 +103,23 @@ export enum PlayFabStatistics {
       generatedCode += `  ${element.StatisticName} = '${element.StatisticName}',\n`;
     });
     generatedCode += `}`;
+
+    // also add an object based on enum w/ defaults
+    // first, write our type
+  
+    // now, setup our const obj
+    generatedCode += `
+export const DefaultPlayerStats: {[key in PlayFabStatistics]: number} = {    
+    `
+    // fill this w/ our defaults
+    statsData.forEach(element => {
+      console.log(chalk.green(`Adding default for ${element.StatisticName}`));
+      generatedCode += `  ${element.StatisticName}:${element.PlayerDefault}, \n`;
+    });
+
+    generatedCode += `
+  }
+    `
   }
 
   // Upload and publish to PlayFab

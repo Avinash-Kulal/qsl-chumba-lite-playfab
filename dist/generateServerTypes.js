@@ -88,6 +88,16 @@ export enum PlayFabStatistics {
             generatedCode += `  ${element.StatisticName} = '${element.StatisticName}',\n`;
         });
         generatedCode += `}`;
+        generatedCode += `
+export const DefaultPlayerStats: {[key in PlayFabStatistics]: number} = {    
+    `;
+        statsData.forEach(element => {
+            console.log(chalk.green(`Adding default for ${element.StatisticName}`));
+            generatedCode += `  ${element.StatisticName}:${element.PlayerDefault}, \n`;
+        });
+        generatedCode += `
+  }
+    `;
     }
     typesCode = typesCode.replace(regex, template.replace('toreplace', generatedCode));
     fs.writeFileSync(typesLocation, typesCode, { encoding: 'utf-8' });
