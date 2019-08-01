@@ -118,7 +118,7 @@ export const DefaultPlayerStats: {[key in PlayFabStatistics]: number} = {
     });
 
     generatedCode += `
-  }
+}
     `
   }
 

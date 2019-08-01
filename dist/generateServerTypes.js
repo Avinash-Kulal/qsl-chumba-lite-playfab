@@ -96,7 +96,7 @@ export const DefaultPlayerStats: {[key in PlayFabStatistics]: number} = {
             generatedCode += `  ${element.StatisticName}:${element.PlayerDefault}, \n`;
         });
         generatedCode += `
-  }
+}
     `;
     }
     typesCode = typesCode.replace(regex, template.replace('toreplace', generatedCode));
