@@ -89,14 +89,16 @@ export enum PlayFabStatistics {
         });
         generatedCode += `}`;
         generatedCode += `
-export const DefaultPlayerStats: {[key in PlayFabStatistics]: number} = {    
+export const GetDefaultPlayerStats = (): {[key in PlayFabStatistics]: number} => {
+  return {    
     `;
         statsData.forEach(element => {
             console.log(chalk.green(`Adding default for ${element.StatisticName}`));
             generatedCode += `  ${element.StatisticName}:${element.PlayerDefault}, \n`;
         });
         generatedCode += `
-}
+  };
+};
     `;
     }
     typesCode = typesCode.replace(regex, template.replace('toreplace', generatedCode));

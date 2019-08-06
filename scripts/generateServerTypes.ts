@@ -109,7 +109,8 @@ export enum PlayFabStatistics {
   
     // now, setup our const obj
     generatedCode += `
-export const DefaultPlayerStats: {[key in PlayFabStatistics]: number} = {    
+export const GetDefaultPlayerStats = (): {[key in PlayFabStatistics]: number} => {
+  return {    
     `
     // fill this w/ our defaults
     statsData.forEach(element => {
@@ -118,7 +119,8 @@ export const DefaultPlayerStats: {[key in PlayFabStatistics]: number} = {
     });
 
     generatedCode += `
-}
+  };
+};
     `
   }
 
