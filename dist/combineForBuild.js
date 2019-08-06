@@ -28,13 +28,13 @@ if (!fs.existsSync(`${currentDir}/combined/`)) {
 }
 const init = () => __awaiter(this, void 0, void 0, function* () {
     let serverCodeOutput = fs.readFileSync(apiLocation).toString('utf-8');
-    serverCodeOutput = serverCodeOutput.replace(/^import .*/gm, '');
+    serverCodeOutput = serverCodeOutput.replace(/^import .*? from '.*?';/gms, '');
     let utilsContent = fs.readFileSync(utilsLocation).toString('utf-8');
-    utilsContent = utilsContent.replace(/^import .*/gm, '');
+    utilsContent = utilsContent.replace(/^import .*? from '.*?';/gms, '');
     utilsContent = utilsContent.replace(/^export /gm, '');
     serverCodeOutput = `${utilsContent}\n${serverCodeOutput}`;
     let typesContent = fs.readFileSync(typesLocation).toString('utf-8');
-    typesContent = typesContent.replace(/^import .*/gm, '');
+    typesContent = typesContent.replace(/^import .*? from '.*?';/gms, '');
     typesContent = typesContent.replace(/^export /gm, '');
     serverCodeOutput = `${typesContent}\n${serverCodeOutput}`;
     fs.writeFileSync(combinedFileLocation, serverCodeOutput, {

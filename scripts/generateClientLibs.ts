@@ -1,6 +1,6 @@
-// Take the dist server code and push it + auto publish it.
 import * as chalkModule from 'chalk';
 import * as fs from 'fs';
+// Take the dist server code and push it + auto publish it.
 
 // Setup environment to look at the calling dir.
 const currentDir = process.cwd();
@@ -210,9 +210,12 @@ const init = async () => {
 
   // Find our interfaces, enums + types in our server code + make them available in client (and simulation)
   // code
-  const interfaceRegex = /^interface (\w*) {(.*?)}\n/gms;
-  const enumRegex = /^enum (\w*) {(.*?)}\n/gms;
-  const typeRegex = /^type (\w*) = {(.*?)}\n/gms;
+  //const interfaceRegex = /^interface (\w*) {(.*?)}\n/gms;
+  const interfaceRegex = /^interface (\w*?)( extends .*?)? {(.*?)\n}/gms;
+  
+  
+  const enumRegex = /^enum (\w*) {(.*?)\n}/gms;
+  const typeRegex = /^type (\w*) = {(.*?)\n}/gms;
   const serverScriptData = fs.readFileSync(serverScriptLocation).toString('utf-8');
 
   // add our types, interfaces and enums to the client dts string
@@ -225,9 +228,13 @@ const init = async () => {
     if (m.index === interfaceRegex.lastIndex) {
       interfaceRegex.lastIndex++;
     }
+    let interfaceHeader = `${m[1]}`;
+    if (m[2]){
+      interfaceHeader = `${m[1]} ${m[2]}`;
+    }
     clientDTSString += `
-export interface ${m[1]} {
-${m[2]}
+export interface ${interfaceHeader} {
+${m[3]}
 }`;
   }
 

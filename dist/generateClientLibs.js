@@ -202,18 +202,22 @@ const init = () => __awaiter(this, void 0, void 0, function* () {
   Generated at ${Date.now()}
   Please do not manually edit.
 */`;
-    const interfaceRegex = /^interface (\w*) {(.*?)}\n/gms;
-    const enumRegex = /^enum (\w*) {(.*?)}\n/gms;
-    const typeRegex = /^type (\w*) = {(.*?)}\n/gms;
+    const interfaceRegex = /^interface (\w*?)( extends .*?)? {(.*?)\n}/gms;
+    const enumRegex = /^enum (\w*) {(.*?)\n}/gms;
+    const typeRegex = /^type (\w*) = {(.*?)\n}/gms;
     const serverScriptData = fs.readFileSync(serverScriptLocation).toString('utf-8');
     let m;
     while ((m = interfaceRegex.exec(serverScriptData)) !== null) {
         if (m.index === interfaceRegex.lastIndex) {
             interfaceRegex.lastIndex++;
         }
+        let interfaceHeader = `${m[1]}`;
+        if (m[2]) {
+            interfaceHeader = `${m[1]} ${m[2]}`;
+        }
         clientDTSString += `
-export interface ${m[1]} {
-${m[2]}
+export interface ${interfaceHeader} {
+${m[3]}
 }`;
     }
     while ((m = enumRegex.exec(serverScriptData)) !== null) {

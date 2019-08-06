@@ -41,13 +41,13 @@ const init = async () => {
   let serverCodeOutput = fs.readFileSync(apiLocation).toString('utf-8');
 
   // remove imports
-  serverCodeOutput = serverCodeOutput.replace(/^import .*/gm, '');
+  serverCodeOutput = serverCodeOutput.replace(/^import .*? from '.*?';/gms, '');
 
   // copy our utils stuff into the server code
   let utilsContent = fs.readFileSync(utilsLocation).toString('utf-8');
 
   // trim imports.
-  utilsContent = utilsContent.replace(/^import .*/gm, '');
+  utilsContent = utilsContent.replace(/^import .*? from '.*?';/gms, '');
 
   // remote export prefix from stuff in here.
   utilsContent = utilsContent.replace(/^export /gm, '');
@@ -59,7 +59,7 @@ const init = async () => {
   let typesContent = fs.readFileSync(typesLocation).toString('utf-8');
 
   // trim imports.
-  typesContent = typesContent.replace(/^import .*/gm, '');
+  typesContent = typesContent.replace(/^import .*? from '.*?';/gms, '');
 
   // remote export prefix from stuff in here.
   typesContent = typesContent.replace(/^export /gm, '');
