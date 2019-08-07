@@ -23,8 +23,8 @@ if (!fs.existsSync(typesLocation) ||
     process.exit(0);
 }
 if (!fs.existsSync(`${currentDir}/combined/`)) {
-    console.log(chalk.red.bold('Please create a `combined` folder'));
-    process.exit(0);
+    console.log(chalk.red.bold('Combined folder does not exist, creating one for you'));
+    fs.mkdirSync(`${currentDir}/combined/`);
 }
 const init = () => __awaiter(this, void 0, void 0, function* () {
     let serverCodeOutput = fs.readFileSync(apiLocation).toString('utf-8');

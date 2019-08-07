@@ -32,8 +32,11 @@ if (
 
 // check and see if combined dir exists.
 if (!fs.existsSync(`${currentDir}/combined/`)) {
-  console.log(chalk.red.bold('Please create a `combined` folder'));
-  process.exit(0);
+
+  console.log(chalk.red.bold('Combined folder does not exist, creating one for you'));
+
+  fs.mkdirSync(`${currentDir}/combined/`);
+
 }
 
 const init = async () => {
