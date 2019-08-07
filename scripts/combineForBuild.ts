@@ -1,5 +1,7 @@
 import * as chalkModule from 'chalk';
 import * as fs from 'fs';
+import { join } from 'path';
+// import {join} from 'fs'
 /*
 
 Given our server code + types, combine them into a file to be processed by PlayFab
@@ -13,14 +15,17 @@ const chalk = chalkModule.default;
 
 const typesLocation = `${currentDir}/src/types.ts`;
 const utilsLocation = `${currentDir}/src/utils.ts`;
-const apiLocation = `${currentDir}/src/api.ts`;
+const clientAPICallsDirectory = `${currentDir}/src/clientHandlers/`;
+const qaAPICallsDirectory = `${currentDir}/src/qaHandlers/`;
+//const apiLocation = `${currentDir}/src/api.ts`;
 
 const combinedFileLocation = `${currentDir}/combined/serverCode.ts`;
 
 if (
   !fs.existsSync(typesLocation) ||
-  !fs.existsSync(utilsLocation) ||
-  !fs.existsSync(apiLocation)
+  !fs.existsSync(utilsLocation)
+  // ||
+  // !fs.existsSync(apiLocation)
 ) {
   console.log(
     chalk.red.bold(
@@ -30,6 +35,11 @@ if (
   process.exit(0);
 }
 
+// check and see if we have Client API calls
+if (!fs.existsSync(clientAPICallsDirectory)) {
+  console.log(chalk.red.bold('Missing client API calls dir!'));
+  process.exit(0);
+}
 // check and see if combined dir exists.
 if (!fs.existsSync(`${currentDir}/combined/`)) {
 
@@ -40,11 +50,44 @@ if (!fs.existsSync(`${currentDir}/combined/`)) {
 }
 
 const init = async () => {
-  // ok, grab all types and port ALL of them into the server code
-  let serverCodeOutput = fs.readFileSync(apiLocation).toString('utf-8');
+  // let's aggregate all the client data + make sure there are handlers for each
+  
 
-  // remove imports
-  serverCodeOutput = serverCodeOutput.replace(/^import .*? from '.*?';/gms, '');
+  let apiOutput = '';
+
+  const clientFileList = fs.readdirSync(clientAPICallsDirectory);
+
+  clientFileList.forEach((fileName) => {
+    console.log(join(clientAPICallsDirectory, fileName));
+    let output = fs.readFileSync(join(clientAPICallsDirectory, fileName)).toString('utf-8');
+    // for each of these, drop our imports
+    output = output.replace(/^import .*? from ['"].*?['"];/gms, '');
+    // now, add our handler based on our regex
+    //console.log(output);
+    const regex = /^const (.*?) = \(/gm;
+    const match = regex.exec(output);
+    
+    const handlerName = match[1];
+    output += `\nhandlers.${handlerName} = ${handlerName};`
+    apiOutput += output;
+  })
+
+  const qaFileList = fs.readdirSync(qaAPICallsDirectory);
+
+  qaFileList.forEach((fileName) => {
+    console.log(join(qaAPICallsDirectory, fileName));
+    let output = fs.readFileSync(join(qaAPICallsDirectory, fileName)).toString('utf-8');
+    // for each of these, drop our imports
+    output = output.replace(/^import .*? from ['"].*?['"];/gms, '');
+    // now, add our handler based on our regex
+    //console.log(output);
+    const regex = /^const (.*?) = \(/gm;
+    const match = regex.exec(output);
+    
+    const handlerName = match[1];
+    output += `\nhandlers.${handlerName} = ${handlerName};`
+    apiOutput += output;
+  })
 
   // copy our utils stuff into the server code
   let utilsContent = fs.readFileSync(utilsLocation).toString('utf-8');
@@ -56,7 +99,7 @@ const init = async () => {
   utilsContent = utilsContent.replace(/^export /gm, '');
 
   // Put at top
-  serverCodeOutput = `${utilsContent}\n${serverCodeOutput}`;
+  apiOutput = `${utilsContent}\n${apiOutput}`;
 
   // do the same with our types files
   let typesContent = fs.readFileSync(typesLocation).toString('utf-8');
@@ -68,9 +111,9 @@ const init = async () => {
   typesContent = typesContent.replace(/^export /gm, '');
 
   // put at top
-  serverCodeOutput = `${typesContent}\n${serverCodeOutput}`;
+  apiOutput = `${typesContent}\n${apiOutput}`;
 
-  fs.writeFileSync(combinedFileLocation, serverCodeOutput, {
+  fs.writeFileSync(combinedFileLocation, apiOutput, {
     encoding: 'utf-8'
   });
   console.log(chalk.green.bold(`Files combined, ready for build + uploading`));
