@@ -1,6 +1,10 @@
 import * as chalkModule from 'chalk';
 import * as fs from 'fs';
-// Take the dist server code and push it + auto publish it.
+
+// TODO TODO TODO - Left off here.
+// Ok, we'll pregen a bunch of good stuff. 
+// then, we'll walk our types file + our client handlers to 
+// build our exported stuff.
 
 // Setup environment to look at the calling dir.
 const currentDir = process.cwd();
