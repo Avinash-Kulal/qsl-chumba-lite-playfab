@@ -143,8 +143,8 @@ const callToPlayFab = (
 
 // Allow ability to also get read only data on command
 export const PFGetCombinedData = (
-  dataKeys: UserDataKeys[],
-  readOnlyKeys: UserDataKeys[],
+  dataKeys: PlayFabUserDataKeys[],
+  readOnlyKeys: PlayFabUserDataKeys[],
 ): Promise<PlayFabClientModels.GetPlayerCombinedInfoResult> => {
   return new Promise<PlayFabClientModels.GetPlayerCombinedInfoResult>((resolve, reject) => {
     const InfoRequestParameters: PlayFabClientModels.GetPlayerCombinedInfoRequestParams = {
@@ -205,38 +205,9 @@ const init = () => __awaiter(this, void 0, void 0, function* () {
 */`;
     const interfaceRegex = /^export interface (\w*?)( extends .*?)? {(.*?)\n}/gms;
     const enumRegex = /^export enum (\w*) {(.*?)\n}/gms;
-    const typeRegex = /^export type (\w*) = {(.*?)\n}/gms;
+    const typeRegex = /^export type (\w*) = (\w*?) ?&? ?{(.*?)}\n/gms;
     const typingsData = fs.readFileSync(typingsLocation).toString('utf-8');
-    let m;
-    while ((m = interfaceRegex.exec(typingsData)) !== null) {
-        if (m.index === interfaceRegex.lastIndex) {
-            interfaceRegex.lastIndex++;
-        }
-        let interfaceHeader = `${m[1]}`;
-        if (m[2]) {
-            interfaceHeader = `${m[1]} ${m[2]}`;
-        }
-        clientDTSString += `
-export interface ${interfaceHeader} {
-${m[3]}
-}`;
-    }
-    while ((m = enumRegex.exec(typingsData)) !== null) {
-        if (m.index === enumRegex.lastIndex) {
-            enumRegex.lastIndex++;
-        }
-        clientDTSString += `
-export enum ${m[1]} {${m[2]}}`;
-    }
-    while ((m = typeRegex.exec(typingsData)) !== null) {
-        if (m.index === typeRegex.lastIndex) {
-            typeRegex.lastIndex++;
-        }
-        clientDTSString += `
-export type ${m[1]} = {
-${m[2]}
-}`;
-    }
+    clientDTSString += typingsData;
     clientDTSString += `\n${callToPlayFabString}`;
     const clientAPICallsDirectory = `${currentDir}/src/clientHandlers/`;
     const clientFileList = fs.readdirSync(clientAPICallsDirectory);
@@ -244,7 +215,7 @@ ${m[2]}
         let output = fs.readFileSync(path_1.join(clientAPICallsDirectory, fileName)).toString('utf-8');
         output = output.replace(/^import .*? from ['"].*?['"];/gms, '');
         const regex = /const (.*?) = \((.*?)\): (.*?) =/gs;
-        m = regex.exec(output);
+        const m = regex.exec(output);
         const methodName = m[1];
         const methodSignature = m[2];
         const sigTypeMatch = methodSignature.match(/: (\w+)/);
