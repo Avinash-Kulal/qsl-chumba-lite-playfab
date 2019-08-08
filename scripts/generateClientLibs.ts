@@ -1,11 +1,17 @@
 import * as chalkModule from 'chalk';
 import * as fs from 'fs';
-// Take the dist server code and push it + auto publish it.
+import { join } from 'path';
+
+// TODO TODO TODO - Left off here.
+// Ok, we'll pregen a bunch of good stuff. 
+// then, we'll walk our types file + our client handlers to 
+// build our exported stuff.
 
 // Setup environment to look at the calling dir.
 const currentDir = process.cwd();
 
-const serverScriptLocation = `${currentDir}/combined/serverCode.ts`;
+// const serverScriptLocation = `${currentDir}/combined/serverCode.ts`;
+const typingsLocation = `${currentDir}/src/types.ts`;
 
 const outputDir = `${currentDir}/client/index.ts`;
 
@@ -78,7 +84,7 @@ export const LinkWithFacebookAsync = (accessToken: string): Promise<PlayFabClien
   });
 };
 
-export const GetLeaderboardAroundPlayer = (statName: PlayFabStatistics): Promise <PlayFabClientModels.GetLeaderboardAroundPlayerResult> => {
+export const PFGetLeaderboardAroundPlayer = (statName: PlayFabStatistics): Promise <PlayFabClientModels.GetLeaderboardAroundPlayerResult> => {
   return new Promise<PlayFabClientModels.GetLeaderboardAroundPlayerResult>((resolve, reject) => {
     PlayFabClient.GetLeaderboardAroundPlayer(
       {
@@ -94,7 +100,7 @@ export const GetLeaderboardAroundPlayer = (statName: PlayFabStatistics): Promise
   });
 };
 
-export const GetLeaderboard = (
+export const PFGetLeaderboard = (
   statName: PlayFabStatistics,
   startPosition: number = 0,
   numResults: number = 10): Promise <PlayFabClientModels.GetLeaderboardResult> => {
@@ -211,25 +217,29 @@ const init = async () => {
   // Find our interfaces, enums + types in our server code + make them available in client (and simulation)
   // code
   //const interfaceRegex = /^interface (\w*) {(.*?)}\n/gms;
-  const interfaceRegex = /^interface (\w*?)( extends .*?)? {(.*?)\n}/gms;
-  
-  
-  const enumRegex = /^enum (\w*) {(.*?)\n}/gms;
-  const typeRegex = /^type (\w*) = {(.*?)\n}/gms;
-  const serverScriptData = fs.readFileSync(serverScriptLocation).toString('utf-8');
+  const interfaceRegex = /^export interface (\w*?)( extends .*?)? {(.*?)\n}/gms;
 
+
+  const enumRegex = /^export enum (\w*) {(.*?)\n}/gms;
+  const typeRegex = /^export type (\w*) = {(.*?)\n}/gms;
+
+  // we're going to use our source stuff, nto the combined as there'll be stuff
+  // I DON'T want going back to the client. 
+  // All things in types, and the handler functions i want to grab.
+
+  const typingsData = fs.readFileSync(typingsLocation).toString('utf-8');
   // add our types, interfaces and enums to the client dts string
 
   let m;
 
   // tslint:disable-next-line: no-conditional-assignment
-  while ((m = interfaceRegex.exec(serverScriptData)) !== null) {
+  while ((m = interfaceRegex.exec(typingsData)) !== null) {
     // This is necessary to avoid infinite loops with zero-width matches
     if (m.index === interfaceRegex.lastIndex) {
       interfaceRegex.lastIndex++;
     }
     let interfaceHeader = `${m[1]}`;
-    if (m[2]){
+    if (m[2]) {
       interfaceHeader = `${m[1]} ${m[2]}`;
     }
     clientDTSString += `
@@ -239,7 +249,7 @@ ${m[3]}
   }
 
   // tslint:disable-next-line: no-conditional-assignment
-  while ((m = enumRegex.exec(serverScriptData)) !== null) {
+  while ((m = enumRegex.exec(typingsData)) !== null) {
     // This is necessary to avoid infinite loops with zero-width matches
     if (m.index === enumRegex.lastIndex) {
       enumRegex.lastIndex++;
@@ -249,7 +259,7 @@ export enum ${m[1]} {${m[2]}}`;
   }
 
   // tslint:disable-next-line: no-conditional-assignment
-  while ((m = typeRegex.exec(serverScriptData)) !== null) {
+  while ((m = typeRegex.exec(typingsData)) !== null) {
     // This is necessary to avoid infinite loops with zero-width matches
     if (m.index === typeRegex.lastIndex) {
       typeRegex.lastIndex++;
@@ -262,18 +272,21 @@ ${m[2]}
   // Seed our method to call the lib.
   clientDTSString += `\n${callToPlayFabString}`;
 
-  // now, grab public methods from the server script
+  // Now, grab the client handlers
+  const clientAPICallsDirectory = `${currentDir}/src/clientHandlers/`;
+  const clientFileList = fs.readdirSync(clientAPICallsDirectory);
 
-  const exposedServerCallRegex = /\/\* Client \*\/.*?const (.*?) = \((.*?)\): (.*?) =/gs;
-
-  // tslint:disable-next-line: no-conditional-assignment
-  while ((m = exposedServerCallRegex.exec(serverScriptData)) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === exposedServerCallRegex.lastIndex) {
-      exposedServerCallRegex.lastIndex++;
-    }
-
-    // The result can be accessed through the `m`-variable.
+  clientFileList.forEach((fileName) => {
+    // console.log(join(clientAPICallsDirectory, fileName));
+    let output = fs.readFileSync(join(clientAPICallsDirectory, fileName)).toString('utf-8');
+    // for each of these, drop our imports
+    output = output.replace(/^import .*? from ['"].*?['"];/gms, '');
+    // now, add our handler based on our regex
+    //console.log(output);
+    const regex = /const (.*?) = \((.*?)\): (.*?) =/gs;
+    //const regex = /^const (.*?) = \(/gm;
+    m = regex.exec(output);
+    // console.log(m);
     const methodName = m[1];
     const methodSignature: string = m[2];
     const sigTypeMatch = methodSignature.match(/: (\w+)/);
@@ -304,10 +317,55 @@ export const Call${methodName} = async (${payloadSig}): Promise<PlayFab${methodR
   }
   return data;
 };`;
-  }
+
+  });
+
+
+  //   const exposedServerCallRegex = /\/\* Client \*\/.*?const (.*?) = \((.*?)\): (.*?) =/gs;
+
+  //   // tslint:disable-next-line: no-conditional-assignment
+  //   while ((m = exposedServerCallRegex.exec(typingsData)) !== null) {
+  //     // This is necessary to avoid infinite loops with zero-width matches
+  //     if (m.index === exposedServerCallRegex.lastIndex) {
+  //       exposedServerCallRegex.lastIndex++;
+  //     }
+
+  //     // The result can be accessed through the `m`-variable.
+  //     const methodName = m[1];
+  //     const methodSignature: string = m[2];
+  //     const sigTypeMatch = methodSignature.match(/: (\w+)/);
+  //     let payloadSig = ``;
+  //     let payloadEntry = `, {}`;
+  //     if (sigTypeMatch !== null) {
+  //       payloadSig = `payload: ${sigTypeMatch[1]}`;
+  //       payloadEntry = `, payload`;
+  //     }
+
+  //     const methodReturn = m[3];
+  //     clientDTSString += '\n';
+  //     clientDTSString += `
+  // interface PlayFab${methodReturn} extends PlayFabFunctionResult {
+  //   FunctionResult: ${methodReturn};
+  // }
+
+  // export const Call${methodName} = async (${payloadSig}): Promise<PlayFab${methodReturn}> => {
+  //   const response = await callToPlayFab('${methodName}'${payloadEntry});
+  //   const data: PlayFab${methodReturn} = {
+  //     FunctionName: response.FunctionName,
+  //     Logs: response.Logs,
+  //     FunctionResult: response.FunctionResult,
+  //     APIRequestsIssued: response.APIRequestsIssued,
+  //   };
+  //   if (response.Error) {
+  //     data.Error = response.Error;
+  //   }
+  //   return data;
+  // };`;
+  //   }
   clientDTSString += `\n`;
 
   fs.writeFileSync(outputDir, clientDTSString, { encoding: 'utf-8' });
+  console.log(chalk.greenBright('Client files created and ready to compile!'));
 };
 
 init();
