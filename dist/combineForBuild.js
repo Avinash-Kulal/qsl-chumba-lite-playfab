@@ -15,6 +15,7 @@ const currentDir = process.cwd();
 const chalk = chalkModule.default;
 const typesLocation = `${currentDir}/src/types.ts`;
 const utilsLocation = `${currentDir}/src/utils.ts`;
+const constantsLocation = `${currentDir}/src/constants.ts`;
 const clientAPICallsDirectory = `${currentDir}/src/clientHandlers/`;
 const qaAPICallsDirectory = `${currentDir}/src/qaHandlers/`;
 const combinedFileLocation = `${currentDir}/combined/serverCode.ts`;
@@ -33,6 +34,18 @@ if (!fs.existsSync(`${currentDir}/combined/`)) {
 }
 const init = () => __awaiter(this, void 0, void 0, function* () {
     let apiOutput = '';
+    let constantsContent = fs.readFileSync(constantsLocation).toString('utf-8');
+    constantsContent = constantsContent.replace(/^import .*? from '.*?';/gms, '');
+    constantsContent = constantsContent.replace(/^export /gm, '');
+    apiOutput += constantsContent;
+    let utilsContent = fs.readFileSync(utilsLocation).toString('utf-8');
+    utilsContent = utilsContent.replace(/^import .*? from '.*?';/gms, '');
+    utilsContent = utilsContent.replace(/^export /gm, '');
+    apiOutput += utilsContent;
+    let typesContent = fs.readFileSync(typesLocation).toString('utf-8');
+    typesContent = typesContent.replace(/^import .*? from '.*?';/gms, '');
+    typesContent = typesContent.replace(/^export /gm, '');
+    apiOutput += typesContent;
     const clientFileList = fs.readdirSync(clientAPICallsDirectory);
     clientFileList.forEach((fileName) => {
         console.log(path_1.join(clientAPICallsDirectory, fileName));
@@ -55,14 +68,6 @@ const init = () => __awaiter(this, void 0, void 0, function* () {
         output += `\nhandlers.${handlerName} = ${handlerName};`;
         apiOutput += output;
     });
-    let utilsContent = fs.readFileSync(utilsLocation).toString('utf-8');
-    utilsContent = utilsContent.replace(/^import .*? from '.*?';/gms, '');
-    utilsContent = utilsContent.replace(/^export /gm, '');
-    apiOutput = `${utilsContent}\n${apiOutput}`;
-    let typesContent = fs.readFileSync(typesLocation).toString('utf-8');
-    typesContent = typesContent.replace(/^import .*? from '.*?';/gms, '');
-    typesContent = typesContent.replace(/^export /gm, '');
-    apiOutput = `${typesContent}\n${apiOutput}`;
     fs.writeFileSync(combinedFileLocation, apiOutput, {
         encoding: 'utf-8'
     });

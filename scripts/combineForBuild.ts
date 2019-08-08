@@ -15,6 +15,7 @@ const chalk = chalkModule.default;
 
 const typesLocation = `${currentDir}/src/types.ts`;
 const utilsLocation = `${currentDir}/src/utils.ts`;
+const constantsLocation = `${currentDir}/src/constants.ts`;
 const clientAPICallsDirectory = `${currentDir}/src/clientHandlers/`;
 const qaAPICallsDirectory = `${currentDir}/src/qaHandlers/`;
 //const apiLocation = `${currentDir}/src/api.ts`;
@@ -55,6 +56,44 @@ const init = async () => {
 
   let apiOutput = '';
 
+  
+  // constants go first!
+  let constantsContent = fs.readFileSync(constantsLocation).toString('utf-8');
+
+  // trim imports.
+  constantsContent = constantsContent.replace(/^import .*? from '.*?';/gms, '');
+
+  // remote export prefix from stuff in here.
+  constantsContent = constantsContent.replace(/^export /gm, '');
+
+  // Put at top
+  apiOutput += constantsContent;
+
+  // copy our utils stuff into the server code
+  let utilsContent = fs.readFileSync(utilsLocation).toString('utf-8');
+
+  // trim imports.
+  utilsContent = utilsContent.replace(/^import .*? from '.*?';/gms, '');
+
+  // remote export prefix from stuff in here.
+  utilsContent = utilsContent.replace(/^export /gm, '');
+
+  apiOutput += utilsContent;
+
+
+  // do the same with our types files
+  let typesContent = fs.readFileSync(typesLocation).toString('utf-8');
+
+  // trim imports.
+  typesContent = typesContent.replace(/^import .*? from '.*?';/gms, '');
+
+  // remote export prefix from stuff in here.
+  typesContent = typesContent.replace(/^export /gm, '');
+
+  // put at top
+  apiOutput += typesContent
+
+
   const clientFileList = fs.readdirSync(clientAPICallsDirectory);
 
   clientFileList.forEach((fileName) => {
@@ -88,30 +127,6 @@ const init = async () => {
     output += `\nhandlers.${handlerName} = ${handlerName};`
     apiOutput += output;
   })
-
-  // copy our utils stuff into the server code
-  let utilsContent = fs.readFileSync(utilsLocation).toString('utf-8');
-
-  // trim imports.
-  utilsContent = utilsContent.replace(/^import .*? from '.*?';/gms, '');
-
-  // remote export prefix from stuff in here.
-  utilsContent = utilsContent.replace(/^export /gm, '');
-
-  // Put at top
-  apiOutput = `${utilsContent}\n${apiOutput}`;
-
-  // do the same with our types files
-  let typesContent = fs.readFileSync(typesLocation).toString('utf-8');
-
-  // trim imports.
-  typesContent = typesContent.replace(/^import .*? from '.*?';/gms, '');
-
-  // remote export prefix from stuff in here.
-  typesContent = typesContent.replace(/^export /gm, '');
-
-  // put at top
-  apiOutput = `${typesContent}\n${apiOutput}`;
 
   fs.writeFileSync(combinedFileLocation, apiOutput, {
     encoding: 'utf-8'

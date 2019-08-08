@@ -10,8 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const chalkModule = require("chalk");
 const fs = require("fs");
+const path_1 = require("path");
 const currentDir = process.cwd();
-const serverScriptLocation = `${currentDir}/combined/serverCode.ts`;
+const typingsLocation = `${currentDir}/src/types.ts`;
 const outputDir = `${currentDir}/client/index.ts`;
 const callToPlayFabString = `import { PlayFab, PlayFabClient } from 'playfab-sdk';
 
@@ -82,7 +83,7 @@ export const LinkWithFacebookAsync = (accessToken: string): Promise<PlayFabClien
   });
 };
 
-export const GetLeaderboardAroundPlayer = (statName: PlayFabStatistics): Promise <PlayFabClientModels.GetLeaderboardAroundPlayerResult> => {
+export const PFGetLeaderboardAroundPlayer = (statName: PlayFabStatistics): Promise <PlayFabClientModels.GetLeaderboardAroundPlayerResult> => {
   return new Promise<PlayFabClientModels.GetLeaderboardAroundPlayerResult>((resolve, reject) => {
     PlayFabClient.GetLeaderboardAroundPlayer(
       {
@@ -98,7 +99,7 @@ export const GetLeaderboardAroundPlayer = (statName: PlayFabStatistics): Promise
   });
 };
 
-export const GetLeaderboard = (
+export const PFGetLeaderboard = (
   statName: PlayFabStatistics,
   startPosition: number = 0,
   numResults: number = 10): Promise <PlayFabClientModels.GetLeaderboardResult> => {
@@ -202,12 +203,12 @@ const init = () => __awaiter(this, void 0, void 0, function* () {
   Generated at ${Date.now()}
   Please do not manually edit.
 */`;
-    const interfaceRegex = /^interface (\w*?)( extends .*?)? {(.*?)\n}/gms;
-    const enumRegex = /^enum (\w*) {(.*?)\n}/gms;
-    const typeRegex = /^type (\w*) = {(.*?)\n}/gms;
-    const serverScriptData = fs.readFileSync(serverScriptLocation).toString('utf-8');
+    const interfaceRegex = /^export interface (\w*?)( extends .*?)? {(.*?)\n}/gms;
+    const enumRegex = /^export enum (\w*) {(.*?)\n}/gms;
+    const typeRegex = /^export type (\w*) = {(.*?)\n}/gms;
+    const typingsData = fs.readFileSync(typingsLocation).toString('utf-8');
     let m;
-    while ((m = interfaceRegex.exec(serverScriptData)) !== null) {
+    while ((m = interfaceRegex.exec(typingsData)) !== null) {
         if (m.index === interfaceRegex.lastIndex) {
             interfaceRegex.lastIndex++;
         }
@@ -220,14 +221,14 @@ export interface ${interfaceHeader} {
 ${m[3]}
 }`;
     }
-    while ((m = enumRegex.exec(serverScriptData)) !== null) {
+    while ((m = enumRegex.exec(typingsData)) !== null) {
         if (m.index === enumRegex.lastIndex) {
             enumRegex.lastIndex++;
         }
         clientDTSString += `
 export enum ${m[1]} {${m[2]}}`;
     }
-    while ((m = typeRegex.exec(serverScriptData)) !== null) {
+    while ((m = typeRegex.exec(typingsData)) !== null) {
         if (m.index === typeRegex.lastIndex) {
             typeRegex.lastIndex++;
         }
@@ -237,11 +238,13 @@ ${m[2]}
 }`;
     }
     clientDTSString += `\n${callToPlayFabString}`;
-    const exposedServerCallRegex = /\/\* Client \*\/.*?const (.*?) = \((.*?)\): (.*?) =/gs;
-    while ((m = exposedServerCallRegex.exec(serverScriptData)) !== null) {
-        if (m.index === exposedServerCallRegex.lastIndex) {
-            exposedServerCallRegex.lastIndex++;
-        }
+    const clientAPICallsDirectory = `${currentDir}/src/clientHandlers/`;
+    const clientFileList = fs.readdirSync(clientAPICallsDirectory);
+    clientFileList.forEach((fileName) => {
+        let output = fs.readFileSync(path_1.join(clientAPICallsDirectory, fileName)).toString('utf-8');
+        output = output.replace(/^import .*? from ['"].*?['"];/gms, '');
+        const regex = /const (.*?) = \((.*?)\): (.*?) =/gs;
+        m = regex.exec(output);
         const methodName = m[1];
         const methodSignature = m[2];
         const sigTypeMatch = methodSignature.match(/: (\w+)/);
@@ -271,8 +274,9 @@ export const Call${methodName} = async (${payloadSig}): Promise<PlayFab${methodR
   }
   return data;
 };`;
-    }
+    });
     clientDTSString += `\n`;
     fs.writeFileSync(outputDir, clientDTSString, { encoding: 'utf-8' });
+    console.log(chalk.greenBright('Client files created and ready to compile!'));
 });
 init();
