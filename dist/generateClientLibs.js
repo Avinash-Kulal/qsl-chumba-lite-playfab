@@ -200,7 +200,6 @@ export const PFSetUserData = (Data: {
 const chalk = chalkModule.default;
 const init = () => __awaiter(this, void 0, void 0, function* () {
     let clientDTSString = `/*
-  Generated at ${Date.now()}
   Please do not manually edit.
 */`;
     const interfaceRegex = /^export interface (\w*?)( extends .*?)? {(.*?)\n}/gms;

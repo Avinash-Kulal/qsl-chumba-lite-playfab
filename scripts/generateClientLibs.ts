@@ -206,7 +206,6 @@ const chalk = chalkModule.default;
 const init = async () => {
   // read the server code for contents
   let clientDTSString = `/*
-  Generated at ${Date.now()}
   Please do not manually edit.
 */`;
 
