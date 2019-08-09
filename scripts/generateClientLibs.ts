@@ -144,8 +144,8 @@ const callToPlayFab = (
 
 // Allow ability to also get read only data on command
 export const PFGetCombinedData = (
-  dataKeys: UserDataKeys[],
-  readOnlyKeys: UserDataKeys[],
+  dataKeys: PlayFabUserDataKeys[],
+  readOnlyKeys: PlayFabUserDataKeys[],
 ): Promise<PlayFabClientModels.GetPlayerCombinedInfoResult> => {
   return new Promise<PlayFabClientModels.GetPlayerCombinedInfoResult>((resolve, reject) => {
     const InfoRequestParameters: PlayFabClientModels.GetPlayerCombinedInfoRequestParams = {
@@ -213,6 +213,8 @@ const init = async () => {
   // ^enum (\w*) {(.*?)}\n
   // ^type (\w*) = {(.*?)}\n
 
+  // we're just going to copy types across... skip all this regex shit.
+
   // Find our interfaces, enums + types in our server code + make them available in client (and simulation)
   // code
   //const interfaceRegex = /^interface (\w*) {(.*?)}\n/gms;
@@ -220,54 +222,60 @@ const init = async () => {
 
 
   const enumRegex = /^export enum (\w*) {(.*?)\n}/gms;
-  const typeRegex = /^export type (\w*) = {(.*?)\n}/gms;
+  // const typeRegex = /^export type (\w*) = {(.*?)\n}/gms;
+  const typeRegex = /^export type (\w*) = (\w*?) ?&? ?{(.*?)}\n/gms;
+
 
   // we're going to use our source stuff, nto the combined as there'll be stuff
   // I DON'T want going back to the client. 
   // All things in types, and the handler functions i want to grab.
 
   const typingsData = fs.readFileSync(typingsLocation).toString('utf-8');
+  clientDTSString += typingsData;
   // add our types, interfaces and enums to the client dts string
 
-  let m;
+//   let m;
 
-  // tslint:disable-next-line: no-conditional-assignment
-  while ((m = interfaceRegex.exec(typingsData)) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === interfaceRegex.lastIndex) {
-      interfaceRegex.lastIndex++;
-    }
-    let interfaceHeader = `${m[1]}`;
-    if (m[2]) {
-      interfaceHeader = `${m[1]} ${m[2]}`;
-    }
-    clientDTSString += `
-export interface ${interfaceHeader} {
-${m[3]}
-}`;
-  }
+//   // tslint:disable-next-line: no-conditional-assignment
+//   while ((m = interfaceRegex.exec(typingsData)) !== null) {
+//     // This is necessary to avoid infinite loops with zero-width matches
+//     if (m.index === interfaceRegex.lastIndex) {
+//       interfaceRegex.lastIndex++;
+//     }
+//     let interfaceHeader = `${m[1]}`;
+//     if (m[2]) {
+//       interfaceHeader = `${m[1]} ${m[2]}`;
+//     }
+//     clientDTSString += `
+// export interface ${interfaceHeader} {
+// ${m[3]}
+// }`;
+//   }
 
-  // tslint:disable-next-line: no-conditional-assignment
-  while ((m = enumRegex.exec(typingsData)) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === enumRegex.lastIndex) {
-      enumRegex.lastIndex++;
-    }
-    clientDTSString += `
-export enum ${m[1]} {${m[2]}}`;
-  }
+//   // tslint:disable-next-line: no-conditional-assignment
+//   while ((m = enumRegex.exec(typingsData)) !== null) {
+//     // This is necessary to avoid infinite loops with zero-width matches
+//     if (m.index === enumRegex.lastIndex) {
+//       enumRegex.lastIndex++;
+//     }
+//     clientDTSString += `
+// export enum ${m[1]} {${m[2]}}`;
+//   }
 
-  // tslint:disable-next-line: no-conditional-assignment
-  while ((m = typeRegex.exec(typingsData)) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === typeRegex.lastIndex) {
-      typeRegex.lastIndex++;
-    }
-    clientDTSString += `
-export type ${m[1]} = {
-${m[2]}
-}`;
-  }
+//   // tslint:disable-next-line: no-conditional-assignment
+//   while ((m = typeRegex.exec(typingsData)) !== null) {
+//     // This is necessary to avoid infinite loops with zero-width matches
+//     if (m.index === typeRegex.lastIndex) {
+//       typeRegex.lastIndex++;
+//     }
+//     console.log(m[1])
+//     console.log(m[2]);
+//     const typeExtends = m[2] ? `${m[2]} & ` : ``;
+//     clientDTSString += `
+// export type ${m[1]} = ${typeExtends}{
+// ${m[3]}
+// }`;
+//   }
   // Seed our method to call the lib.
   clientDTSString += `\n${callToPlayFabString}`;
 
@@ -284,7 +292,7 @@ ${m[2]}
     //console.log(output);
     const regex = /const (.*?) = \((.*?)\): (.*?) =/gs;
     //const regex = /^const (.*?) = \(/gm;
-    m = regex.exec(output);
+    const m = regex.exec(output);
     // console.log(m);
     const methodName = m[1];
     const methodSignature: string = m[2];

@@ -52,7 +52,7 @@ export enum PlayFabCurrencyDisplayNames {
     if (fs.existsSync(publicTitleDataPath)) {
         const titleData = JSON.parse(fs.readFileSync(publicTitleDataPath).toString('utf-8'));
         console.log(chalk.green('Found title data'));
-        let generatedTitleType = `\nexport interface PlayFabPublicTitleData {\n`;
+        let generatedTitleType = `\nexport type PlayFabPublicTitleData = {\n`;
         Object.keys(titleData).forEach(key => {
             let keyType = titleData[key].type;
             if (typeof keyType === 'undefined') {
@@ -66,7 +66,7 @@ export enum PlayFabCurrencyDisplayNames {
     if (fs.existsSync(internalTitleDataPath)) {
         const titleData = JSON.parse(fs.readFileSync(internalTitleDataPath).toString('utf-8'));
         console.log(chalk.green('Found title data'));
-        let generatedTitleType = `\nexport interface PlayFabInternalTitleData {\n`;
+        let generatedTitleType = `\nexport type PlayFabInternalTitleData = {\n`;
         Object.keys(titleData).forEach(key => {
             let keyType = titleData[key].type;
             if (typeof keyType === 'undefined') {
