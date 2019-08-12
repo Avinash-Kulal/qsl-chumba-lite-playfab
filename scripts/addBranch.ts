@@ -1,8 +1,6 @@
 import { default as axios } from 'axios';
-import { execSync } from 'child_process';
 import * as dotenv from "dotenv";
-import * as envalid from "envalid";
-import { str } from "envalid";
+import { getBranch, validateEnv } from "./utils";
 
 // Setup environment to look at the calling dir.
 const currentDir = process.cwd();
@@ -33,21 +31,9 @@ function addBranch(titleId: string, branch: string, secret: string): Promise<any
     });
 }
 
-function getBranch(): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const branch: string = execSync("git rev-parse --abbrev-ref HEAD").toString();
-        resolve(branch);
-    });
-}
-
-
 
 (async () => {
-    envalid.cleanEnv(process.env, {
-        PF_TITLE_ID: str(),
-        PF_DEVELOPER_SECRET: str(),
-        INSTANCEURL: str(),
-    });
+    validateEnv();
 
     const titleId: string = process.env.PF_TITLE_ID;
     const secret: string = process.env.PF_DEVELOPER_SECRET;

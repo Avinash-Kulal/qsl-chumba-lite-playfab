@@ -1,8 +1,7 @@
 import * as fs from "fs";
 import * as minimist from "minimist";
 import { default as axios } from "axios";
-import * as envalid from "envalid";
-import { str } from "envalid";
+import { validateEnv } from "./utils";
 import * as dotenv from "dotenv";
 
 const instances = ["dev", "qa", "prod"];
@@ -57,11 +56,7 @@ function updateFile(titleId: string, secret: string): Promise<any> {
 }
 
 (async () => {
-    envalid.cleanEnv(process.env, {
-        PF_TITLE_ID: str(),
-        PF_DEVELOPER_SECRET: str(),
-        INSTANCEURL: str(),
-    });
+    validateEnv();
     const argv = minimist(process.argv.splice(2));
     const branch = argv._[0];
     const result = await getBranch(branch.split("\n")[0]);

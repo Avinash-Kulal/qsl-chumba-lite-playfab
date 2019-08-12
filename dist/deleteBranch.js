@@ -9,10 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = require("axios");
-const child_process_1 = require("child_process");
 const dotenv = require("dotenv");
-const envalid = require("envalid");
-const envalid_1 = require("envalid");
+const utils_1 = require("./utils");
 const currentDir = process.cwd();
 dotenv.config({
     path: `${currentDir}/.env`,
@@ -36,19 +34,9 @@ function deleteBranch(branch) {
         });
     });
 }
-function getBranch() {
-    return new Promise((resolve, reject) => {
-        const branch = child_process_1.execSync("git rev-parse --abbrev-ref HEAD").toString();
-        resolve(branch);
-    });
-}
 (() => __awaiter(this, void 0, void 0, function* () {
-    envalid.cleanEnv(process.env, {
-        PF_TITLE_ID: envalid_1.str(),
-        PF_DEVELOPER_SECRET: envalid_1.str(),
-        INSTANCEURL: envalid_1.str(),
-    });
-    const branch = yield getBranch();
+    utils_1.validateEnv();
+    const branch = yield utils_1.getBranch();
     const result = yield deleteBranch(branch.split("\n")[0]);
     console.log(result.status);
 }))();

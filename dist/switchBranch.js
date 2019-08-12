@@ -11,8 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const minimist = require("minimist");
 const axios_1 = require("axios");
-const envalid = require("envalid");
-const envalid_1 = require("envalid");
+const utils_1 = require("./utils");
 const dotenv = require("dotenv");
 const instances = ["dev", "qa", "prod"];
 const currentDir = process.cwd();
@@ -56,12 +55,7 @@ function updateFile(titleId, secret) {
     });
 }
 (() => __awaiter(this, void 0, void 0, function* () {
-    envalid.cleanEnv(process.env, {
-        PF_TITLE_ID: envalid_1.str(),
-        PF_DEVELOPER_SECRET: envalid_1.str(),
-        INSTANCEURL: envalid_1.str(),
-        INVALID_ENV: envalid_1.str(),
-    });
+    utils_1.validateEnv();
     const argv = minimist(process.argv.splice(2));
     const branch = argv._[0];
     const result = yield getBranch(branch.split("\n")[0]);
