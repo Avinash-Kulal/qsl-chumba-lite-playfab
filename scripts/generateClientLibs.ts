@@ -142,6 +142,22 @@ const callToPlayFab = (
   });
 };
 
+// Allow the client to set the display name
+export const PFSetDisplayName = async (DisplayName: string): Promise<PlayFabClientModels.UpdateUserTitleDisplayNameResult> => {
+  return new Promise<PlayFabClientModels.UpdateUserTitleDisplayNameResult>((resolve, reject) => {
+    PlayFabClient.UpdateUserTitleDisplayName({
+      DisplayName,
+    },
+      (err, result) => {
+        if (err) {
+          console.log(JSON.stringify(err));
+          reject(err);
+        }
+        resolve(result.data);
+      })
+  });
+}
+
 // Allow ability to also get read only data on command
 export const PFGetCombinedData = (
   dataKeys: PlayFabUserDataKeys[],
