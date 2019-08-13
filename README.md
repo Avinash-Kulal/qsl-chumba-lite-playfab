@@ -52,5 +52,21 @@ Uploads the compiled cloud code and publishes. Use with caution - will IMMEDIATE
 
 Parses the combined source cloud code in host project and generates typings for client projects that would connect to it. Looks for any enums, interfaces, types and any method tagged with `/* Client */`. Format of the code is _VERY_ important as we use regex to get all this info, use prettier or tslint. The `tslint.json` in this directory should suffice.
 
+`scripts/addBranch.ts`
+
+Adds the branch, titleId and secret of the playfab instance located in the server code env file and pushes it to the playfab instance manager express application
+
+`scripts/deleteBranch.ts`
+
+Deletes a branch from playfab instance manager express application using the branch name for the playfab instance
+
+`scripts/listBranches.ts`
+
+Lists all the branches currently in the playfab instance manager express application
+
+`scripts/switchBranch.ts`
+
+Updates PF_TITLE_ID and PF_DEVELOPER_SECRET in the env file so the code can be push to a certain playfab instance without having to go to the playfab website and get the required information
+
 
 If changes are made, be sure to run `npm run build` and bump the semver on `package.json`. This will enable the JS scripts to be called from importing projects to run npm scripts.
