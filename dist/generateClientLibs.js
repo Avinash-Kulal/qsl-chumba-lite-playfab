@@ -243,7 +243,7 @@ const init = () => __awaiter(this, void 0, void 0, function* () {
         const methodReturn = m[3];
         clientDTSString += '\n';
         clientDTSString += `
-interface PlayFab${methodReturn} extends PlayFabFunctionResult {
+export interface PlayFab${methodReturn} extends PlayFabFunctionResult {
   FunctionResult: ${methodReturn};
 }
 
