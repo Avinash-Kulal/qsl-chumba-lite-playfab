@@ -50,6 +50,23 @@ export const LoginWithCustomIdAsync = (customId: string): Promise<PlayFabClientM
   });
 };
 
+export const LinkWithCustomIDAsync = (CustomId: string): Promise<PlayFabClientModels.LinkCustomIDResult> => {
+  return new Promise<PlayFabClientModels.LinkCustomIDResult>((resolve, reject) => {
+    PlayFabClient.LinkCustomID(
+      {
+        ForceLink: true,
+        CustomId,
+      },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LinkCustomIDResult>) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(res.data);
+      },
+    );
+  });
+};
+
 export const LoginWithFacebookAsync = (accessToken: string): Promise<PlayFabClientModels.LoginResult> => {
   return new Promise<PlayFabClientModels.LoginResult>((resolve, reject) => {
     PlayFabClient.LoginWithFacebook(

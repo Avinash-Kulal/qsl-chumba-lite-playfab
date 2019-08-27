@@ -10,14 +10,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^12.7.1",
+    "@types/node": "^12.7.2",
     "axios": "^0.18.1",
     "chalk": "^2.4.2",
     "commander": "^2.20.0",
     "dotenv": "^8.0.0",
     "envalid": "^5.0.0",
     "minimist": "^1.2.0",
-    "playfab-sdk": "^2.31.190717",
+    "playfab-sdk": "^2.32.190821",
     "rimraf": "^2.7.1",
     "yargs": "^13.3.0"
   },
