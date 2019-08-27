@@ -42,7 +42,6 @@ export const LoginWithCustomIdAsync = (customId: string): Promise<PlayFabClientM
       (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LoginResult>) => {
         if (error) {
           reject(error);
-          return;
         }
         resolve(res.data);
       },
@@ -60,7 +59,6 @@ export const LoginWithFacebookAsync = (accessToken: string): Promise<PlayFabClie
       (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LoginResult>) => {
         if (error) {
           reject(error);
-          return;
         }
         resolve(res.data);
       },
@@ -78,7 +76,6 @@ export const LinkWithFacebookAsync = (accessToken: string, ForceLink: boolean = 
       (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LinkFacebookAccountResult>) => {
         if (error) {
           reject(error);
-          return;
         }
         resolve(res);
       },
