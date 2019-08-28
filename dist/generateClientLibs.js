@@ -49,6 +49,23 @@ export const LoginWithCustomIdAsync = (customId: string): Promise<PlayFabClientM
   });
 };
 
+export const LinkWithCustomIDAsync = (CustomId: string): Promise<PlayFabClientModels.LinkCustomIDResult> => {
+  return new Promise<PlayFabClientModels.LinkCustomIDResult>((resolve, reject) => {
+    PlayFabClient.LinkCustomID(
+      {
+        ForceLink: true,
+        CustomId,
+      },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LinkCustomIDResult>) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(res.data);
+      },
+    );
+  });
+};
+
 export const LoginWithFacebookAsync = (accessToken: string): Promise<PlayFabClientModels.LoginResult> => {
   return new Promise<PlayFabClientModels.LoginResult>((resolve, reject) => {
     PlayFabClient.LoginWithFacebook(
@@ -66,16 +83,61 @@ export const LoginWithFacebookAsync = (accessToken: string): Promise<PlayFabClie
   });
 };
 
-export const LinkWithFacebookAsync = (accessToken: string): Promise<PlayFabClientModels.LinkFacebookAccountResult> => {
+export const LinkWithFacebookAsync = (accessToken: string, ForceLink: boolean = false): Promise<PlayFabClientModels.LinkFacebookAccountResult> => {
   return new Promise<PlayFabClientModels.LinkFacebookAccountResult>((resolve, reject) => {
     PlayFabClient.LinkFacebookAccount(
       {
-        ForceLink: true,
+        ForceLink,
         AccessToken: accessToken,
       },
       (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LinkFacebookAccountResult>) => {
         if (error) {
           reject(error);
+        }
+        resolve(res);
+      },
+    );
+  });
+};
+
+export const UnlinkFacebookAccountAsync = (): Promise<PlayFabClientModels.UnlinkFacebookAccountResult> => {
+  return new Promise<PlayFabClientModels.UnlinkFacebookAccountResult>((resolve, reject) => {
+    PlayFabClient.UnlinkFacebookAccount(
+      { },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.UnlinkFacebookAccountResult>) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(res);
+      },
+    );
+  });
+};
+
+export const UnlinkCustomIDAsync = ( CustomId: string ): Promise<PlayFabClientModels.UnlinkCustomIDResult> => {
+  return new Promise<PlayFabClientModels.UnlinkCustomIDResult>((resolve, reject) => {
+    PlayFabClient.UnlinkCustomID(
+      { CustomId },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.UnlinkCustomIDResult>) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(res);
+      },
+    );
+  });
+};
+
+export const GetUserAccountInfoAsync = (): Promise<PlayFabClientModels.GetAccountInfoResult> => {
+  return new Promise<PlayFabClientModels.GetAccountInfoResult>((resolve, reject) => {
+    PlayFabClient.GetAccountInfo(
+      {},
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.GetAccountInfoResult>) => {
+        if (error) {
+          reject(error);
+          return;
         }
         resolve(res.data);
       },

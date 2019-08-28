@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import { join } from 'path';
 
 // TODO TODO TODO - Left off here.
-// Ok, we'll pregen a bunch of good stuff. 
-// then, we'll walk our types file + our client handlers to 
+// Ok, we'll pregen a bunch of good stuff.
+// then, we'll walk our types file + our client handlers to
 // build our exported stuff.
 
 // Setup environment to look at the calling dir.
@@ -50,6 +50,23 @@ export const LoginWithCustomIdAsync = (customId: string): Promise<PlayFabClientM
   });
 };
 
+export const LinkWithCustomIDAsync = (CustomId: string): Promise<PlayFabClientModels.LinkCustomIDResult> => {
+  return new Promise<PlayFabClientModels.LinkCustomIDResult>((resolve, reject) => {
+    PlayFabClient.LinkCustomID(
+      {
+        ForceLink: true,
+        CustomId,
+      },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LinkCustomIDResult>) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(res.data);
+      },
+    );
+  });
+};
+
 export const LoginWithFacebookAsync = (accessToken: string): Promise<PlayFabClientModels.LoginResult> => {
   return new Promise<PlayFabClientModels.LoginResult>((resolve, reject) => {
     PlayFabClient.LoginWithFacebook(
@@ -67,16 +84,61 @@ export const LoginWithFacebookAsync = (accessToken: string): Promise<PlayFabClie
   });
 };
 
-export const LinkWithFacebookAsync = (accessToken: string): Promise<PlayFabClientModels.LinkFacebookAccountResult> => {
+export const LinkWithFacebookAsync = (accessToken: string, ForceLink: boolean = false): Promise<PlayFabClientModels.LinkFacebookAccountResult> => {
   return new Promise<PlayFabClientModels.LinkFacebookAccountResult>((resolve, reject) => {
     PlayFabClient.LinkFacebookAccount(
       {
-        ForceLink: true,
+        ForceLink,
         AccessToken: accessToken,
       },
       (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LinkFacebookAccountResult>) => {
         if (error) {
           reject(error);
+        }
+        resolve(res);
+      },
+    );
+  });
+};
+
+export const UnlinkFacebookAccountAsync = (): Promise<PlayFabClientModels.UnlinkFacebookAccountResult> => {
+  return new Promise<PlayFabClientModels.UnlinkFacebookAccountResult>((resolve, reject) => {
+    PlayFabClient.UnlinkFacebookAccount(
+      { },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.UnlinkFacebookAccountResult>) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(res);
+      },
+    );
+  });
+};
+
+export const UnlinkCustomIDAsync = ( CustomId: string ): Promise<PlayFabClientModels.UnlinkCustomIDResult> => {
+  return new Promise<PlayFabClientModels.UnlinkCustomIDResult>((resolve, reject) => {
+    PlayFabClient.UnlinkCustomID(
+      { CustomId },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.UnlinkCustomIDResult>) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(res);
+      },
+    );
+  });
+};
+
+export const GetUserAccountInfoAsync = (): Promise<PlayFabClientModels.GetAccountInfoResult> => {
+  return new Promise<PlayFabClientModels.GetAccountInfoResult>((resolve, reject) => {
+    PlayFabClient.GetAccountInfo(
+      {},
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.GetAccountInfoResult>) => {
+        if (error) {
+          reject(error);
+          return;
         }
         resolve(res.data);
       },
@@ -233,65 +295,63 @@ const init = async () => {
 
   // Find our interfaces, enums + types in our server code + make them available in client (and simulation)
   // code
-  //const interfaceRegex = /^interface (\w*) {(.*?)}\n/gms;
+  // const interfaceRegex = /^interface (\w*) {(.*?)}\n/gms;
   const interfaceRegex = /^export interface (\w*?)( extends .*?)? {(.*?)\n}/gms;
-
 
   const enumRegex = /^export enum (\w*) {(.*?)\n}/gms;
   // const typeRegex = /^export type (\w*) = {(.*?)\n}/gms;
   const typeRegex = /^export type (\w*) = (\w*?) ?&? ?{(.*?)}\n/gms;
 
-
   // we're going to use our source stuff, nto the combined as there'll be stuff
-  // I DON'T want going back to the client. 
+  // I DON'T want going back to the client.
   // All things in types, and the handler functions i want to grab.
 
   const typingsData = fs.readFileSync(typingsLocation).toString('utf-8');
   clientDTSString += typingsData;
   // add our types, interfaces and enums to the client dts string
 
-//   let m;
+  //   let m;
 
-//   // tslint:disable-next-line: no-conditional-assignment
-//   while ((m = interfaceRegex.exec(typingsData)) !== null) {
-//     // This is necessary to avoid infinite loops with zero-width matches
-//     if (m.index === interfaceRegex.lastIndex) {
-//       interfaceRegex.lastIndex++;
-//     }
-//     let interfaceHeader = `${m[1]}`;
-//     if (m[2]) {
-//       interfaceHeader = `${m[1]} ${m[2]}`;
-//     }
-//     clientDTSString += `
-// export interface ${interfaceHeader} {
-// ${m[3]}
-// }`;
-//   }
+  //   // tslint:disable-next-line: no-conditional-assignment
+  //   while ((m = interfaceRegex.exec(typingsData)) !== null) {
+  //     // This is necessary to avoid infinite loops with zero-width matches
+  //     if (m.index === interfaceRegex.lastIndex) {
+  //       interfaceRegex.lastIndex++;
+  //     }
+  //     let interfaceHeader = `${m[1]}`;
+  //     if (m[2]) {
+  //       interfaceHeader = `${m[1]} ${m[2]}`;
+  //     }
+  //     clientDTSString += `
+  // export interface ${interfaceHeader} {
+  // ${m[3]}
+  // }`;
+  //   }
 
-//   // tslint:disable-next-line: no-conditional-assignment
-//   while ((m = enumRegex.exec(typingsData)) !== null) {
-//     // This is necessary to avoid infinite loops with zero-width matches
-//     if (m.index === enumRegex.lastIndex) {
-//       enumRegex.lastIndex++;
-//     }
-//     clientDTSString += `
-// export enum ${m[1]} {${m[2]}}`;
-//   }
+  //   // tslint:disable-next-line: no-conditional-assignment
+  //   while ((m = enumRegex.exec(typingsData)) !== null) {
+  //     // This is necessary to avoid infinite loops with zero-width matches
+  //     if (m.index === enumRegex.lastIndex) {
+  //       enumRegex.lastIndex++;
+  //     }
+  //     clientDTSString += `
+  // export enum ${m[1]} {${m[2]}}`;
+  //   }
 
-//   // tslint:disable-next-line: no-conditional-assignment
-//   while ((m = typeRegex.exec(typingsData)) !== null) {
-//     // This is necessary to avoid infinite loops with zero-width matches
-//     if (m.index === typeRegex.lastIndex) {
-//       typeRegex.lastIndex++;
-//     }
-//     console.log(m[1])
-//     console.log(m[2]);
-//     const typeExtends = m[2] ? `${m[2]} & ` : ``;
-//     clientDTSString += `
-// export type ${m[1]} = ${typeExtends}{
-// ${m[3]}
-// }`;
-//   }
+  //   // tslint:disable-next-line: no-conditional-assignment
+  //   while ((m = typeRegex.exec(typingsData)) !== null) {
+  //     // This is necessary to avoid infinite loops with zero-width matches
+  //     if (m.index === typeRegex.lastIndex) {
+  //       typeRegex.lastIndex++;
+  //     }
+  //     console.log(m[1])
+  //     console.log(m[2]);
+  //     const typeExtends = m[2] ? `${m[2]} & ` : ``;
+  //     clientDTSString += `
+  // export type ${m[1]} = ${typeExtends}{
+  // ${m[3]}
+  // }`;
+  //   }
   // Seed our method to call the lib.
   clientDTSString += `\n${callToPlayFabString}`;
 
@@ -305,9 +365,9 @@ const init = async () => {
     // for each of these, drop our imports
     output = output.replace(/^import .*? from ['"].*?['"];/gms, '');
     // now, add our handler based on our regex
-    //console.log(output);
+    // console.log(output);
     const regex = /const (.*?) = \((.*?)\): (.*?) =/gs;
-    //const regex = /^const (.*?) = \(/gm;
+    // const regex = /^const (.*?) = \(/gm;
     const m = regex.exec(output);
     // console.log(m);
     const methodName = m[1];
@@ -342,7 +402,6 @@ export const Call${methodName} = async (${payloadSig}): Promise<PlayFab${methodR
 };`;
 
   });
-
 
   //   const exposedServerCallRegex = /\/\* Client \*\/.*?const (.*?) = \((.*?)\): (.*?) =/gs;
 
