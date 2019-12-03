@@ -84,6 +84,75 @@ export const LoginWithFacebookAsync = (accessToken: string): Promise<PlayFabClie
   });
 };
 
+export const LoginWithGoogleAccountAsync = (AccessToken: string): Promise<PlayFabClientModels.LoginResult> => {
+  return new Promise<PlayFabClientModels.LoginResult>((resolve, reject) => {
+    PlayFabClient.LoginWithGoogleAccount(
+      ({
+        CreateAccount: true,
+        AccessToken,
+      } as any),
+      (err: PlayFabModule.IPlayFabError, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LoginResult>) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(res.data);
+      },
+    );
+  });
+};
+
+export const LoginWithOpenIdConnect = (ConnectionId: string, IdToken: string): Promise<PlayFabClientModels.LoginResult> => {
+  return new Promise<PlayFabClientModels.LoginResult>((resolve, reject) => {
+    PlayFabClient.LoginWithOpenIdConnect(
+      {
+        ConnectionId,
+        IdToken
+      },
+      (err: PlayFabModule.IPlayFabError, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LoginResult>) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(res.data);
+      }
+    );
+  });
+}
+
+export const LinkWithOpenIdConnect = (ConnectionId: string, IdToken: string, ForceLink: boolean = false): Promise<PlayFabClientModels.EmptyResult> => {
+  return new Promise<PlayFabClientModels.EmptyResult>((resolve, reject) => {
+    PlayFabClient.LinkOpenIdConnect(
+      {
+        ConnectionId,
+        IdToken,
+        ForceLink
+      },
+      (err: PlayFabModule.IPlayFabError, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.EmptyResult>) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(res);
+      }
+    );
+  });
+}
+
+export const LinkWithGoogleAsync = (AccessToken: string, ForceLink: boolean = false): Promise<PlayFabClientModels.LinkGoogleAccountResult> => {
+  return new Promise<PlayFabClientModels.LinkGoogleAccountResult>((resolve, reject) => {
+    PlayFabClient.LinkGoogleAccount(
+      {
+        ForceLink,
+        AccessToken,
+      } as any,
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LinkGoogleAccountResult>) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve(res);
+      },
+    );
+  });
+};
+
 export const LinkWithFacebookAsync = (accessToken: string, ForceLink: boolean = false): Promise<PlayFabClientModels.LinkFacebookAccountResult> => {
   return new Promise<PlayFabClientModels.LinkFacebookAccountResult>((resolve, reject) => {
     PlayFabClient.LinkFacebookAccount(
@@ -115,6 +184,38 @@ export const UnlinkFacebookAccountAsync = (): Promise<PlayFabClientModels.Unlink
     );
   });
 };
+
+export const UnlinkOpenIdConnect = (ConnectionId: string): Promise<PlayFabClientModels.EmptyResponse> => {
+  return new Promise<PlayFabClientModels.EmptyResponse>((resolve, reject) => {
+    PlayFabClient.UnlinkOpenIdConnect(
+      {
+        ConnectionId,
+      },
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.EmptyResponse>) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(res);
+      }
+    );
+  });
+}
+
+export const UnlinkWithGoogleAsync = (): Promise<PlayFabClientModels.UnlinkGoogleAccountResult> => {
+  return new Promise<PlayFabClientModels.UnlinkGoogleAccountResult>((resolve, reject) => {
+    PlayFabClient.UnlinkGoogleAccount(
+      {},
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.UnlinkGoogleAccountResult>) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(res);
+      }
+    );
+  });
+}
 
 export const UnlinkCustomIDAsync = ( CustomId: string ): Promise<PlayFabClientModels.UnlinkCustomIDResult> => {
   return new Promise<PlayFabClientModels.UnlinkCustomIDResult>((resolve, reject) => {
