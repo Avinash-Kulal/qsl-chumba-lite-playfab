@@ -105,6 +105,7 @@ export const LoginWithOpenIdConnect = (ConnectionId: string, IdToken: string): P
   return new Promise<PlayFabClientModels.LoginResult>((resolve, reject) => {
     PlayFabClient.LoginWithOpenIdConnect(
       {
+        CreateAccount: true,
         ConnectionId,
         IdToken
       },
