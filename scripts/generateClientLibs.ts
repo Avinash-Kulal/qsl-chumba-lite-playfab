@@ -233,6 +233,42 @@ export const UnlinkCustomIDAsync = ( CustomId: string ): Promise<PlayFabClientMo
   });
 };
 
+export const WriteCharacterEvent = (request: PlayFabClientModels.WriteClientCharacterEventRequest): Promise<PlayFabClientModels.WriteEventResponse> => {
+  return new Promise<PlayFabClientModels.WriteEventResponse>((resolve, reject) => {
+    PlayFabClient.WriteCharacterEvent(request, (error: PlayFabModule.IPlayFabError, result: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.WriteEventResponse>) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(result.data);
+    })
+  })
+}
+
+export const WriteTitleEvent = (request: PlayFabClientModels.WriteTitleEventRequest): Promise<PlayFabClientModels.WriteEventResponse> => {
+  return new Promise<PlayFabClientModels.WriteEventResponse>((resolve, reject) => {
+    PlayFabClient.WriteTitleEvent(request, (error: PlayFabModule.IPlayFabError, result: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.WriteEventResponse>) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(result.data);
+    })
+  })
+}
+
+export const WritePlayerEvent = (request: PlayFabClientModels.WriteClientPlayerEventRequest): Promise<PlayFabClientModels.WriteEventResponse> => {
+  return new Promise<PlayFabClientModels.WriteEventResponse>((resolve, reject) => {
+    PlayFabClient.WritePlayerEvent(request, (error: PlayFabModule.IPlayFabError, result: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.WriteEventResponse>) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(result.data);
+    })
+  })
+}
+
 export const GetUserAccountInfoAsync = (): Promise<PlayFabClientModels.GetAccountInfoResult> => {
   return new Promise<PlayFabClientModels.GetAccountInfoResult>((resolve, reject) => {
     PlayFabClient.GetAccountInfo(
