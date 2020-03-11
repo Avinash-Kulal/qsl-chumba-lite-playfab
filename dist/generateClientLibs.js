@@ -233,6 +233,55 @@ export const UnlinkCustomIDAsync = ( CustomId: string ): Promise<PlayFabClientMo
   });
 };
 
+export const LoginWithAppleAsync = (IdentityToken: string): Promise<PlayFabClientModels.LoginResult> => {
+  return new Promise<PlayFabClientModels.LoginResult>((resolve, reject) => {
+    PlayFabClient.LoginWithApple(
+      {
+        CreateAccount: true,
+        IdentityToken,
+      },
+      (err: PlayFabModule.IPlayFabError, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.LoginResult>) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(res.data);
+      },
+    );
+  });
+};
+
+export const LinkWithAppleAsync = (IdentityToken: string, ForceLink: boolean = false): Promise<PlayFabClientModels.EmptyResult> => {
+  return new Promise<PlayFabClientModels.EmptyResult>((resolve, reject) => {
+    PlayFabClient.LinkApple(
+      {
+        IdentityToken,
+        ForceLink,
+      },
+      (err: PlayFabModule.IPlayFabError, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.EmptyResult>) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(res);
+      }
+    );
+  });
+};
+
+export const UnlinkWithAppleAsync = (): Promise<PlayFabClientModels.EmptyResponse> => {
+  return new Promise<PlayFabClientModels.EmptyResponse>((resolve, reject) => {
+    PlayFabClient.UnlinkApple(
+      {},
+      (error, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.EmptyResponse>) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve(res);
+      }
+    );
+  });
+};
+
 export const WriteCharacterEvent = (request: PlayFabClientModels.WriteClientCharacterEventRequest): Promise<PlayFabClientModels.WriteEventResponse> => {
   return new Promise<PlayFabClientModels.WriteEventResponse>((resolve, reject) => {
     PlayFabClient.WriteCharacterEvent(request, (error: PlayFabModule.IPlayFabError, result: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.WriteEventResponse>) => {
