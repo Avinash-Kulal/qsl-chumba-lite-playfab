@@ -282,6 +282,23 @@ export const UnlinkWithAppleAsync = (): Promise<PlayFabClientModels.EmptyRespons
   });
 };
 
+export const UpdateUserTitleDisplayNameAsync = (DisplayName: string): Promise<PlayFabClientModels.UpdateUserTitleDisplayNameResult> => {
+  return new Promise((resolve, reject) => {
+    PlayFabClient.UpdateUserTitleDisplayName(
+      {
+        DisplayName,
+      },
+      (err: PlayFabModule.IPlayFabError, res: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.UpdateUserTitleDisplayNameResult>) => {
+        if (err) {
+          return reject(err);
+        }
+
+        return resolve(res.data);
+      }
+    );
+  });
+};
+
 export const WriteCharacterEvent = (request: PlayFabClientModels.WriteClientCharacterEventRequest): Promise<PlayFabClientModels.WriteEventResponse> => {
   return new Promise<PlayFabClientModels.WriteEventResponse>((resolve, reject) => {
     PlayFabClient.WriteCharacterEvent(request, (error: PlayFabModule.IPlayFabError, result: PlayFabModule.IPlayFabSuccessContainer<PlayFabClientModels.WriteEventResponse>) => {
